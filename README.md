@@ -18,6 +18,8 @@ Telegram bot for chats with admin functions written on Python3
 - /note Show note. Usage: /note <note_name>. You can also show note by using #<note_name>
 - /addnote Add note
 - /delnote Delete note
+- /weather Show current weather in the specified city/ Usage: /weather <city name>
 
 ## Usage:
 To use commands that apply to a specific user or message (such as /kick, /ban, /mute, /addnote, e.g.) you should reply command to his message.
+
