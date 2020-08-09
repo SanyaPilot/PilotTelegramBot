@@ -17,15 +17,8 @@ curs = conn.cursor()
 table = """ CREATE TABLE IF NOT EXISTS notes (
                 id integer PRIMARY KEY,
                 name text NOT NULL,
-                message_id integer NOT NULL
-            ); """
-curs.execute(table)
-
-table = """ CREATE TABLE IF NOT EXISTS new_users (
-                id integer PRIMARY KEY,
-                user_id text NOT NULL,
-                chat_id text NOT NULL,
-                start_time integer NOT NULL
+                message_id integer NOT NULL,
+                chat_id integer NOT NULL
             ); """
 curs.execute(table)
 conn.close()
@@ -481,11 +474,12 @@ def unban(message):
 @bot.message_handler(commands=['notes'])
 def notes(message):
     try:
-        cmd = """ SELECT name FROM notes """
+        cmd = """ SELECT name FROM notes
+                  WHERE chat_id = ?"""
 
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
-        curs.execute(cmd)
+        curs.execute(cmd, (message.chat.id,))
         rows = curs.fetchall()
         conn.close()
         text = '┏━━━━━━━━━━━━━━━━━━━━━━\n┣Список заметок:\n┃\n'
@@ -509,8 +503,9 @@ def note(message):
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
         cmd = """ SELECT message_id FROM notes
-                  WHERE name = ? """
-        curs.execute(cmd, (name,))
+                  WHERE name = ?,
+                        chat_id = ?"""
+        curs.execute(cmd, (name, message.chat.id))
 
         rows = curs.fetchall()
 
@@ -532,8 +527,8 @@ def addnote(message):
             name = message.text[9:]
             conn = sqlite3.connect('data.db')
             curs = conn.cursor()
-            cmd = """ INSERT INTO notes(name, message_id)
-                      VALUES(?,?) """
+            cmd = """ INSERT INTO notes(name, message_id, chat_id)
+                      VALUES(?,?,?) """
             params = (name, message.reply_to_message.message_id)
             curs.execute(cmd, params)
             conn.commit()
@@ -556,8 +551,10 @@ def delnote(message):
             name = message.text[9:]
             conn = sqlite3.connect('data.db')
             curs = conn.cursor()
-            cmd = """ DELETE FROM notes WHERE name = ? """
-            curs.execute(cmd, (name,))
+            cmd = """ DELETE FROM notes
+                      WHERE name = ?
+                            chat_id = ?"""
+            curs.execute(cmd, (name,message.chat.id))
             conn.commit()
             conn.close()
 
