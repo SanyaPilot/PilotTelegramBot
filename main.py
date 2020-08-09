@@ -504,8 +504,8 @@ def note(message):
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
         cmd = """ SELECT message_id FROM notes
-                  WHERE name = ?,
-                        chat_id = ?"""
+                  WHERE name = ?
+                  AND chat_id = ?"""
         curs.execute(cmd, (name, message.chat.id))
 
         rows = curs.fetchall()
@@ -530,7 +530,7 @@ def addnote(message):
             curs = conn.cursor()
             cmd = """ INSERT INTO notes(name, message_id, chat_id)
                       VALUES(?,?,?) """
-            params = (name, message.reply_to_message.message_id)
+            params = (name, message.reply_to_message.message_id, message.chat.id)
             curs.execute(cmd, params)
             conn.commit()
             conn.close()
@@ -554,7 +554,7 @@ def delnote(message):
             curs = conn.cursor()
             cmd = """ DELETE FROM notes
                       WHERE name = ?
-                            chat_id = ?"""
+                      AND chat_id = ?"""
             curs.execute(cmd, (name,message.chat.id))
             conn.commit()
             conn.close()
@@ -635,8 +635,9 @@ def text_handler(message):
             conn = sqlite3.connect('data.db')
             curs = conn.cursor()
             cmd = """ SELECT message_id FROM notes
-                      WHERE name = ? """
-            curs.execute(cmd, (name,))
+                      WHERE name = ?
+                      AND chat_id = ?"""
+            curs.execute(cmd, (name,message.chat.id))
             rows = curs.fetchall()
             conn.close()
 
