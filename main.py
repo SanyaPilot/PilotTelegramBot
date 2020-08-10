@@ -21,6 +21,7 @@ table = """ CREATE TABLE IF NOT EXISTS notes (
                 chat_id integer NOT NULL
             ); """
 curs.execute(table)
+conn.commit()
 conn.close()
 
 translator = Translator()
