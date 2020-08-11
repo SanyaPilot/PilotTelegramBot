@@ -628,6 +628,54 @@ def weather(message):
         bot.reply_to(message, 'Упс... Что-то пошло не так')
 
 
+@bot.message_handler(commands=['forecast'])
+def forecast(message):
+    #try:
+        city_name = message.text[9:]
+        loc = geolocator.geocode(city_name)
+        if loc is None:
+            bot.reply_to(message, 'Такой город не найден')
+        else:
+            response = requests.get('https://api.openweathermap.org/data/2.5/onecall?lat=' + str(loc.latitude) +
+                                    '&lon=' + str(loc.longitude) + '&appid=c1c0032b6ff3be83e44ab641e780fc3d&lang=RU' +
+                                    '&units=metric')
+
+            data = json.loads(response.content)
+            destination = loc.address.split(',')
+
+            text = '<b><i>Погода в '
+            for i in destination:
+                if i == destination[0]:
+                    text += i
+                else:
+                    text += ',' + i
+
+            text += '</i></b>\n'
+
+            for i in range(8):
+                text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
+                text += '<b>Прогноз на ' + time.strftime("%d/%m", time.gmtime(data['daily'][i]['dt'])) + '</b>\n'
+                text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
+                text += '<b>' + str(data['daily'][i]['temp']['day']) + ' °C <i>' + data['daily'][i]['weather'][0]['description'].capitalize() + '</i></b>\n'
+                text += '<i>Мин. температура:</i> <b>' + str(data['daily'][i]['temp']['min']) + ' °C</b>\n'
+                text += '<i>Макс. температура:</i> <b>' + str(data['daily'][i]['temp']['max']) + ' °C</b>\n'
+                text += '<i>Температура утром:</i> <b>' + str(data['daily'][i]['temp']['morn']) + ' °C</b>\n'
+                text += '<i>Температура вечером:</i> <b>' + str(data['daily'][i]['temp']['eve']) + ' °C</b>\n'
+                text += '<i>Температура ночью:</i> <b>' + str(data['daily'][i]['temp']['night']) + ' °C</b>\n'
+                text += '<i>Влажность:</i> <b>' + str(data['daily'][i]['humidity']) + '%</b>\n'
+                text += '<i>Давление:</i> <b>' + str(data['daily'][i]['pressure']) + ' гПа</b>\n'
+                text += '<i>Скорость ветра:</i> <b>' + str(data['daily'][i]['wind_speed']) + ' м/с</b>\n'
+                text += '<i>Облачность:</i> <b>' + str(data['daily'][i]['clouds']) + '%</b>\n'
+                text += '<i>UV индекс:</i> <b>' + str(data['daily'][i]['uvi']) + '</b>\n\n'
+
+            bot.send_message(chat_id=message.chat.id,
+                             text=text,
+                             reply_to_message_id=message.message_id,
+                             parse_mode='HTML')
+    #except Exception:
+        #bot.reply_to(message, 'Упс... Что-то пошло не так')
+
+
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
     try:
