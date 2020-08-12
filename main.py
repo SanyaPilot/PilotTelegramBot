@@ -5,8 +5,7 @@ import json
 import sqlite3
 import time
 from threading import Timer
-import googletrans
-from googletrans import Translator
+
 from geopy.geocoders import Nominatim
 
 import kick as Kick
@@ -14,6 +13,7 @@ import ban as Ban
 import note as Note
 import perms as Perms
 import mute as Mute
+import translate
 
 bot = telebot.TeleBot('1073948237:AAGKs3HzRBZwBZGkoQ5moJIakWQn39nQtX4')
 
@@ -29,8 +29,6 @@ table = """ CREATE TABLE IF NOT EXISTS notes (
 curs.execute(table)
 conn.commit()
 conn.close()
-
-translator = Translator()
 
 geolocator = Nominatim(user_agent="sanya_pilot_telegram_bot")
 
@@ -169,21 +167,8 @@ def delnote_wrapper(message):
 
 
 @bot.message_handler(commands=['tr'])
-def tr(message):
-    try:
-        lang_code = message.text[4:]
-        result = translator.translate(message.reply_to_message.text, dest=lang_code)
-
-        langs = googletrans.LANGUAGES
-        text = '<i>Перевод с <b>' + langs[result.src] + '</b> на <b>' + langs[lang_code] + '</b>\n'
-        text += 'Translate from <b>' + langs[result.src] + '</b> to <b>' + langs[
-            lang_code] + '</b></i>\n\n' + result.text
-        bot.send_message(chat_id=message.chat.id,
-                         reply_to_message_id=message.message_id,
-                         parse_mode='HTML',
-                         text=text)
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def tr_wrapper(message):
+    translate.tr(message)
 
 
 @bot.message_handler(commands=['weather'])
