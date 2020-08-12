@@ -218,60 +218,9 @@ def button_callback_handler(call):
                 bot.answer_callback_query(callback_query_id=call.id,
                                           text='Нельзя проходить проверку за другого пользователя')
 
-        elif call.data == 'forecast_prev':
-            if call.from_user.id == forecasts[call.message.message_id][9]:
-                if not forecasts[call.message.message_id][8] <= 0:
-                    forecasts[call.message.message_id][8] -= 1
-                    keyboard = types.InlineKeyboardMarkup(row_width=2)
-                    key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
-                    key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
-                    keyboard.add(key_prev, key_next)
-                    key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='forecast_close')
-                    keyboard.add(key_close)
-
-                    bot.edit_message_text(chat_id=call.message.chat.id,
-                                          message_id=call.message.message_id,
-                                          text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
-                                          parse_mode='HTML',
-                                          reply_markup=keyboard)
-                else:
-                    bot.answer_callback_query(callback_query_id=call.id,
-                                              text='Это начало списка')
-            else:
-                bot.answer_callback_query(callback_query_id=call.id,
-                                          text='Нельзя управлять меню прогноза погоды другого пользователя')
-
-        elif call.data == 'forecast_next':
-            if call.from_user.id == forecasts[call.message.message_id][9]:
-                if not forecasts[call.message.message_id][8] >= 7:
-                    forecasts[call.message.message_id][8] += 1
-                    keyboard = types.InlineKeyboardMarkup(row_width=2)
-                    key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
-                    key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
-                    keyboard.add(key_prev, key_next)
-                    key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='forecast_close')
-                    keyboard.add(key_close)
-
-                    bot.edit_message_text(chat_id=call.message.chat.id,
-                                          message_id=call.message.message_id,
-                                          text=forecasts[call.message.message_id][
-                                              forecasts[call.message.message_id][8]],
-                                          parse_mode='HTML',
-                                          reply_markup=keyboard)
-                else:
-                    bot.answer_callback_query(callback_query_id=call.id,
-                                              text='Это конец списка')
-            else:
-                bot.answer_callback_query(callback_query_id=call.id,
-                                          text='Нельзя управлять меню прогноза погоды другого пользователя')
-
-        elif call.data == 'forecast_close':
-            if call.from_user.id == forecasts[call.message.message_id][9]:
-                forecasts.pop(call.message.message_id)
-                bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
-            else:
-                bot.answer_callback_query(callback_query_id=call.id,
-                                          text='Нельзя управлять меню прогноза погоды другого пользователя')
+        if 'forecast' in call.data:
+            Weather.call_handler(call)
+    
     except Exception:
         bot.reply_to(call.message, 'Упс... Что-то пошло не так')
 
