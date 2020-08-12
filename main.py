@@ -1,8 +1,7 @@
 import telebot
-from telebot import types
 import sqlite3
-from threading import Timer
 
+import greeting as Greeting
 import kick as Kick
 import ban as Ban
 import note as Note
@@ -26,8 +25,6 @@ table = """ CREATE TABLE IF NOT EXISTS notes (
 curs.execute(table)
 conn.commit()
 conn.close()
-
-timers = {}
 
 
 @bot.message_handler(commands=['start'])
@@ -154,18 +151,7 @@ def forecast_wrapper(message):
 def text_handler(message):
     try:
         if message.text[0] == '#':
-            name = message.text[1:]
-            conn = sqlite3.connect('data.db')
-            curs = conn.cursor()
-            cmd = """ SELECT message_id FROM notes
-                      WHERE name = ?
-                      AND chat_id = ?"""
-            curs.execute(cmd, (name,message.chat.id))
-            rows = curs.fetchall()
-            conn.close()
-
-            row = rows[0]
-            bot.forward_message(message.chat.id, message.chat.id, row[0])
+            Note.text_handler(message)
 
     except Exception:
         pass
@@ -173,27 +159,8 @@ def text_handler(message):
 
 # Триггер на нового юзера в чате
 @bot.message_handler(content_types=['new_chat_members'])
-def greeting(message):
-    if not message.from_user.is_bot:
-        text = 'Привет, как дела?\nЗдесь мы осуждаем телефон LeEco Le 2 (ну или не совсем)\nВ общем не '
-        text += 'разжигай холивары и все будет ок)\n\nНо перед тем как ты вступишь в чат, нам нужно проверить,'
-        text += ' действительно ли ты не бот. Для этого нужно нажать на кнопку, я думаю ты справишся\n\n'
-        text += '<i><b>Ограничение по времени: 5 минут.\n'
-        text += 'Если по истечении времени не была нажата кнопка, ты получаешь кик</b></i>'
-
-        keyboard = types.InlineKeyboardMarkup()
-        key = types.InlineKeyboardButton(text='Я хочу общатся!', callback_data='captcha_ok')
-        keyboard.add(key)
-
-        bot.send_message(chat_id=message.chat.id,
-                         reply_to_message_id=message.message_id,
-                         parse_mode='HTML',
-                         text=text,
-                         reply_markup=keyboard)
-
-        global timers
-        timers[message.from_user.id] = Timer(300.0, kick_bot, [message.chat.id, message.from_user.id])
-        timers[message.from_user.id].start()
+def greeting_wrapper(message):
+    Greeting.greeting(message)
 
 
 # Триггер на уход юзера из чата
@@ -204,46 +171,15 @@ def greeting(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def button_callback_handler(call):
-    global forecasts
     try:
         if call.data == 'captcha_ok':
-            global timers
-            try:
-                timers[call.from_user.id].cancel()
-                bot.edit_message_text(chat_id=call.message.chat.id,
-                                      message_id=call.message.message_id,
-                                      text='Вы успешно прошли проверку!')
-                timers.pop(call.from_user.id)
-            except KeyError:
-                bot.answer_callback_query(callback_query_id=call.id,
-                                          text='Нельзя проходить проверку за другого пользователя')
+            Greeting.call_handler(call)
 
         if 'forecast' in call.data:
             Weather.call_handler(call)
-    
+
     except Exception:
         bot.reply_to(call.message, 'Упс... Что-то пошло не так')
-
-
-def kick_bot(chat_id, user_id):
-    try:
-        bot.kick_chat_member(chat_id=chat_id,
-                             user_id=user_id,
-                             until_date=0)
-
-        bot.unban_chat_member(chat_id=chat_id,
-                              user_id=user_id)
-
-        chat_member = bot.get_chat_member(chat_id=chat_id, user_id=user_id)
-        user = chat_member.user
-        bot.send_message(chat_id=chat_id,
-                         text='Пользователь @' + str(user.username) +
-                              ' не прошел проверку на бота\nОн был кикнут')
-        global timers
-        timers.pop(user_id)
-
-    except Exception:
-        bot.send_message(chat_id=chat_id, text='Упс... Что-то пошло не так')
 
 
 bot.polling()

@@ -93,3 +93,18 @@ def delnote(message):
 
     except Exception:
         bot.reply_to(message, 'Упс... Что-то пошло не так')
+
+
+def text_handler(message):
+    name = message.text[1:]
+    conn = sqlite3.connect('data.db')
+    curs = conn.cursor()
+    cmd = """ SELECT message_id FROM notes
+                          WHERE name = ?
+                          AND chat_id = ?"""
+    curs.execute(cmd, (name, message.chat.id))
+    rows = curs.fetchall()
+    conn.close()
+
+    row = rows[0]
+    bot.forward_message(message.chat.id, message.chat.id, row[0])

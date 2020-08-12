@@ -9,7 +9,6 @@ def mute(message):
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            chat = bot.get_chat(chat_id=message.chat.id)
             bot.restrict_chat_member(chat_id=message.chat.id,
                                      user_id=message.reply_to_message.from_user.id,
                                      can_send_messages=False,
@@ -74,7 +73,6 @@ def tmute(message):
                     text = ' дней'
                 timeout_text = timeout_numbers + text
 
-            chat = bot.get_chat(chat_id=message.chat.id)
             bot.restrict_chat_member(chat_id=message.chat.id,
                                      user_id=message.reply_to_message.from_user.id,
                                      can_send_messages=False,
