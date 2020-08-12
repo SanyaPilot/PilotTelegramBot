@@ -9,6 +9,10 @@ import googletrans
 from googletrans import Translator
 from geopy.geocoders import Nominatim
 
+import kick as Kick
+import ban as Ban
+import note as Note
+
 bot = telebot.TeleBot('1073948237:AAGKs3HzRBZwBZGkoQ5moJIakWQn39nQtX4')
 
 conn = sqlite3.connect('data.db')
@@ -319,254 +323,53 @@ def promote(message):
 
 
 @bot.message_handler(commands=['kick'])
-def kick(message):
-    try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            bot.kick_chat_member(chat_id=message.chat.id,
-                                 user_id=message.reply_to_message.from_user.id,
-                                 until_date=0)
-            bot.unban_chat_member(chat_id=message.chat.id,
-                                  user_id=message.reply_to_message.from_user.id)
-
-            bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был кикнут\nОн сможет вернуться в чат в будущем')
-        else:
-            bot.reply_to(message, 'Для этого нужны админские права')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def kick_wrapper(message):
+    Kick.kick(message)
 
 
 @bot.message_handler(commands=['kickme'])
-def kick(message):
-    try:
-        bot.kick_chat_member(chat_id=message.chat.id,
-                             user_id=message.from_user.id,
-                             until_date=0)
-        bot.unban_chat_member(chat_id=message.chat.id,
-                              user_id=message.from_user.id)
-
-        bot.send_message(chat_id=message.chat.id,
-                         text='Пользователь @' + str(message.from_user.username) +
-                              ' был кикнут\nОн сможет вернуться в чат в будущем')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def kickme_wrapper(message):
+    Kick.kickme(message)
 
 
 @bot.message_handler(commands=['ban'])
-def ban(message):
-    try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            bot.kick_chat_member(chat_id=message.chat.id,
-                                 user_id=message.reply_to_message.from_user.id,
-                                 until_date=0)
-
-            bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
-        else:
-            bot.reply_to(message, 'Для этого нужны админские права')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def ban_wrapper(message):
+    Ban.ban(message)
 
 
 @bot.message_handler(commands=['banme'])
-def kick(message):
-    try:
-        bot.kick_chat_member(chat_id=message.chat.id,
-                             user_id=message.from_user.id,
-                             until_date=0)
-
-        bot.send_message(chat_id=message.chat.id,
-                         text='Пользователь @' + str(message.from_user.username) +
-                              ' был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def banme_wrapper(message):
+    Ban.banme(message)
 
 
 @bot.message_handler(commands=['tban'])
-def tban(message):
-    try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            timeout = message.text[6:]
-            timeout_units = timeout[-1:]
-            timeout_numbers = timeout[:-1]
-            final_timeout = None
-            timeout_text = None
-            if timeout_units == 's':
-                final_timeout = int(timeout_numbers)
-                if int(timeout_numbers[-1:]) == 1:
-                    text = ' секунда'
-                elif 2 <= int(timeout_numbers) <= 4:
-                    text = ' секунды'
-                else:
-                    text = ' секунд'
-                timeout_text = timeout_numbers + text
-            elif timeout_units == 'm':
-                final_timeout = int(timeout_numbers) * 60
-                if int(timeout_numbers[-1:]) == 1:
-                    text = ' минута'
-                elif 2 <= int(timeout_numbers) <= 4:
-                    text = ' минуты'
-                else:
-                    text = ' минут'
-                timeout_text = timeout_numbers + text
-            elif timeout_units == 'h':
-                final_timeout = int(timeout_numbers) * 3600
-                if int(timeout_numbers) == 1:
-                    text = ' час'
-                elif 2 <= int(timeout_numbers) <= 4:
-                    text = ' часа'
-                else:
-                    text = ' часов'
-                timeout_text = timeout_numbers + text
-            elif timeout_units == 'd':
-                final_timeout = int(timeout_numbers) * 86400
-                if int(timeout_numbers) == 1:
-                    text = ' день'
-                elif 2 <= int(timeout_numbers[-1:]) <= 4:
-                    text = ' дня'
-                else:
-                    text = ' дней'
-                timeout_text = timeout_numbers + text
-
-            bot.kick_chat_member(chat_id=message.chat.id,
-                                 user_id=message.reply_to_message.from_user.id,
-                                 until_date=int(time.time()) + final_timeout)
-
-            bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был забанен на ' + timeout_text +
-                                  '\nОн сможет вернуться в чат после истечения времени')
-        else:
-            bot.reply_to(message, 'Для этого нужны админские права')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def tban_wrapper(message):
+    Ban.tban(message)
 
 
 @bot.message_handler(commands=['unban'])
-def unban(message):
-    try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            bot.unban_chat_member(chat_id=message.chat.id,
-                                  user_id=message.reply_to_message.from_user.id)
-
-            bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был разбанен\nТеперь он может вернуться в чат')
-        else:
-            bot.reply_to(message, 'Для этого нужны админские права')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def unban_wrapper(message):
+    Ban.unban(message)
 
 
 @bot.message_handler(commands=['notes'])
-def notes(message):
-    try:
-        cmd = """ SELECT name FROM notes
-                  WHERE chat_id = ?"""
-
-        conn = sqlite3.connect('data.db')
-        curs = conn.cursor()
-        curs.execute(cmd, (message.chat.id,))
-        rows = curs.fetchall()
-        conn.close()
-        text = '┏━━━━━━━━━━━━━━━━━━━━━━\n┣Список заметок:\n┃\n'
-        for row in rows:
-            text += '┣['
-            text += row[0]
-            text += '\n'
-
-        text += '┗━━━━━━━━━━━━━━━━━━━━━━\n'
-        text += 'Вы можете просмотреть заметку командой /note <имя-заметки> либо при помощи #<имя-заметки>'
-        bot.reply_to(message, text)
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def notes_wrapper(message):
+    Note.notes(message)
 
 
 @bot.message_handler(commands=['note'])
-def note(message):
-    try:
-        name = message.text[6:]
-        conn = sqlite3.connect('data.db')
-        curs = conn.cursor()
-        cmd = """ SELECT message_id FROM notes
-                  WHERE name = ?
-                  AND chat_id = ?"""
-        curs.execute(cmd, (name, message.chat.id))
-
-        rows = curs.fetchall()
-
-        conn.close()
-
-        row = rows[0]
-        bot.forward_message(message.chat.id, message.chat.id, row[0])
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def note_wrapper(message):
+    Note.note(message)
 
 
 @bot.message_handler(commands=['addnote'])
-def addnote(message):
-    try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            name = message.text[9:]
-            conn = sqlite3.connect('data.db')
-            curs = conn.cursor()
-            cmd = """ INSERT INTO notes(name, message_id, chat_id)
-                      VALUES(?,?,?) """
-            params = (name, message.reply_to_message.message_id, message.chat.id)
-            curs.execute(cmd, params)
-            conn.commit()
-            conn.close()
-
-            bot.reply_to(message, 'Заметка была добавлена')
-        else:
-            bot.reply_to(message, 'Для этого нужны админские права')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def addnote_wrapper(message):
+    Note.addnote(message)
 
 
 @bot.message_handler(commands=['delnote'])
-def delnote(message):
-    try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            name = message.text[9:]
-            conn = sqlite3.connect('data.db')
-            curs = conn.cursor()
-            cmd = """ DELETE FROM notes
-                      WHERE name = ?
-                      AND chat_id = ?"""
-            curs.execute(cmd, (name,message.chat.id))
-            conn.commit()
-            conn.close()
-
-            bot.reply_to(message, 'Заметка была удалена')
-        else:
-            bot.reply_to(message, 'Для этого нужны админские права')
-
-    except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+def delnote_wrapper(message):
+    Note.delnote(message)
 
 
 @bot.message_handler(commands=['tr'])
