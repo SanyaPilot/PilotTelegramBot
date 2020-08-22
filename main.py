@@ -175,7 +175,7 @@ def button_callback_handler(call):
         if call.data == 'captcha_ok':
             Greeting.call_handler(call)
 
-        if 'forecast' in call.data:
+        if 'forecast' in call.data or 'weather' in call.data:
             Weather.call_handler(call)
 
     except Exception:

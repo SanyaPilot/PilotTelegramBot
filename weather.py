@@ -9,6 +9,7 @@ bot = telebot.TeleBot('1073948237:AAGKs3HzRBZwBZGkoQ5moJIakWQn39nQtX4')
 geolocator = Nominatim(user_agent="sanya_pilot_telegram_bot")
 
 forecasts = {}
+weathers = {}
 
 
 def weather(message):
@@ -18,6 +19,13 @@ def weather(message):
         if loc is None:
             bot.reply_to(message, 'Такой город не найден')
         else:
+            weather_message = bot.send_message(chat_id=message.chat.id,
+                                                text='Готовлю прогноз погоды для Вас)',
+                                                reply_to_message_id=message.message_id)
+
+            global weathers
+            weathers[weather_message.message_id] = message.from_user.id
+
             response = requests.get('https://api.openweathermap.org/data/2.5/onecall?lat=' + str(loc.latitude) +
                                     '&lon=' + str(loc.longitude) + '&appid=c1c0032b6ff3be83e44ab641e780fc3d&lang=RU' +
                                     '&units=metric')
@@ -44,10 +52,16 @@ def weather(message):
             text += '<i>Облачность:</i> <b>' + str(data['current']['clouds']) + '%</b>\n'
             text += '<i>UV индекс:</i> <b>' + str(data['current']['uvi']) + '</b>\n'
 
-            bot.send_message(chat_id=message.chat.id,
-                             text=text,
-                             reply_to_message_id=message.message_id,
-                             parse_mode='HTML')
+            keyboard = types.InlineKeyboardMarkup()
+            key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='weather_close')
+            keyboard.add(key_close)
+
+            bot.edit_message_text(chat_id=message.chat.id,
+                                  message_id=weather_message.message_id,
+                                  text=text,
+                                  parse_mode='HTML',
+                                  reply_markup=keyboard)
+
     except Exception:
         bot.reply_to(message, 'Упс... Что-то пошло не так')
 
@@ -169,6 +183,14 @@ def call_handler(call):
     elif call.data == 'forecast_close':
         if call.from_user.id == forecasts[call.message.message_id][9]:
             forecasts.pop(call.message.message_id)
+            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+        else:
+            bot.answer_callback_query(callback_query_id=call.id,
+                                      text='Нельзя управлять меню прогноза погоды другого пользователя')
+
+    elif call.data == 'weather_close':
+        if call.from_user.id == weathers[call.message.message_id]:
+            weathers.pop(call.message.message_id)
             bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         else:
             bot.answer_callback_query(callback_query_id=call.id,
