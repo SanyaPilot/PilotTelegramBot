@@ -30,7 +30,8 @@ def notes(message):
 
 def note(message):
     try:
-        name = message.text[6:]
+        words = message.text.split()
+        name = words[1]
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
         cmd = """ SELECT message_id FROM notes
@@ -54,7 +55,8 @@ def addnote(message):
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            name = message.text[9:]
+            words = message.text.split()
+            name = words[1]
             conn = sqlite3.connect('data.db')
             curs = conn.cursor()
             cmd = """ INSERT INTO notes(name, message_id, chat_id)
@@ -77,7 +79,8 @@ def delnote(message):
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            name = message.text[9:]
+            words = message.text.split()
+            name = words[1]
             conn = sqlite3.connect('data.db')
             curs = conn.cursor()
             cmd = """ DELETE FROM notes

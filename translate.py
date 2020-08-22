@@ -8,7 +8,8 @@ translator = Translator()
 
 def tr(message):
     try:
-        lang_code = message.text[4:]
+        words = message.text.split()
+        lang_code = words[1]
         result = translator.translate(message.reply_to_message.text, dest=lang_code)
 
         langs = googletrans.LANGUAGES

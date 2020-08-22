@@ -14,7 +14,8 @@ weathers = {}
 
 def weather(message):
     try:
-        city_name = message.text[9:]
+        words = message.text.split()
+        city_name = words[1]
         loc = geolocator.geocode(city_name)
         if loc is None:
             bot.reply_to(message, 'Такой город не найден')
@@ -68,7 +69,8 @@ def weather(message):
 
 def forecast(message):
     try:
-        city_name = message.text[9:]
+        words = message.text.split()
+        city_name = words[1]
         loc = geolocator.geocode(city_name)
         if loc is None:
             bot.reply_to(message, 'Такой город не найден')

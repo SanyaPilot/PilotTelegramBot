@@ -31,7 +31,8 @@ def tmute(message):
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            timeout = message.text[7:]
+            words = message.text.split()
+            timeout = words[1]
             timeout_units = timeout[-1:]
             timeout_numbers = timeout[:-1]
             final_timeout = None
