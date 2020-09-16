@@ -114,9 +114,7 @@ def promote(message):
                                     user_id=message.reply_to_message.from_user.id,
                                     can_pin_messages=1,
                                     can_change_info=1,
-                                    can_edit_messages=1,
                                     can_invite_users=1,
-                                    can_post_messages=1,
                                     can_delete_messages=1,
                                     can_promote_members=1,
                                     can_restrict_members=1
