@@ -85,14 +85,12 @@ def demote(message):
         if member.status == 'creator' or member.status == 'administrator':
             bot.promote_chat_member(chat_id=message.chat.id,
                                     user_id=message.reply_to_message.from_user.id,
-                                    can_pin_messages=0,
-                                    can_change_info=0,
-                                    can_edit_messages=0,
-                                    can_invite_users=0,
-                                    can_post_messages=0,
-                                    can_delete_messages=0,
-                                    can_promote_members=0,
-                                    can_restrict_members=0
+                                    can_pin_messages=True,
+                                    can_change_info=True,
+                                    can_invite_users=True,
+                                    can_delete_messages=True,
+                                    can_promote_members=True,
+                                    can_restrict_members=True
                                     )
             bot.send_message(chat_id=message.chat.id,
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
@@ -112,12 +110,12 @@ def promote(message):
         if member.status == 'creator' or member.status == 'administrator':
             bot.promote_chat_member(chat_id=message.chat.id,
                                     user_id=message.reply_to_message.from_user.id,
-                                    can_pin_messages=1,
-                                    can_change_info=1,
-                                    can_invite_users=1,
-                                    can_delete_messages=1,
-                                    can_promote_members=1,
-                                    can_restrict_members=1
+                                    can_pin_messages=True,
+                                    can_change_info=True,
+                                    can_invite_users=True,
+                                    can_delete_messages=True,
+                                    can_promote_members=True,
+                                    can_restrict_members=True
                                     )
             bot.send_message(chat_id=message.chat.id,
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
