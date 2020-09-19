@@ -1,11 +1,12 @@
 import telebot
+import config
 from telebot import types
 import requests
 import json
 import time
 from geopy.geocoders import Nominatim
 
-bot = telebot.TeleBot('1073948237:AAGKs3HzRBZwBZGkoQ5moJIakWQn39nQtX4')
+bot = telebot.TeleBot(config.token)
 geolocator = Nominatim(user_agent="sanya_pilot_telegram_bot")
 
 forecasts = {}

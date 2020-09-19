@@ -1,6 +1,7 @@
 import telebot
 import sqlite3
 
+import config
 import greeting as Greeting
 import kick as Kick
 import ban as Ban
@@ -11,7 +12,7 @@ import translate
 import introduction
 import weather as Weather
 
-bot = telebot.TeleBot('1073948237:AAGKs3HzRBZwBZGkoQ5moJIakWQn39nQtX4')
+bot = telebot.TeleBot(config.token)
 
 conn = sqlite3.connect('data.db')
 curs = conn.cursor()

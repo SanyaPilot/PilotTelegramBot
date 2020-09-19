@@ -1,8 +1,9 @@
 import telebot
+import config
 import googletrans
 from googletrans import Translator
 
-bot = telebot.TeleBot('1073948237:AAGKs3HzRBZwBZGkoQ5moJIakWQn39nQtX4')
+bot = telebot.TeleBot(config.token)
 translator = Translator()
 
 
