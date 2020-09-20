@@ -22,7 +22,7 @@ def weather(message):
             bot.reply_to(message, 'Такой город не найден')
         else:
             weather_message = bot.send_message(chat_id=message.chat.id,
-                                                text='Готовлю прогноз погоды для Вас)',
+                                                text='Готовлю прогноз погоды для Вас',
                                                 reply_to_message_id=message.message_id)
 
             global weathers
@@ -77,7 +77,7 @@ def forecast(message):
             bot.reply_to(message, 'Такой город не найден')
         else:
             forecast_message = bot.send_message(chat_id=message.chat.id,
-                                                text='Готовлю прогноз погоды для Вас)',
+                                                text='Готовлю прогноз погоды для Вас',
                                                 reply_to_message_id=message.message_id)
 
             global forecasts

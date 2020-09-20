@@ -29,7 +29,8 @@ table = """ CREATE TABLE IF NOT EXISTS chats (
                 id integer PRIMARY KEY,
                 chat_id integer NOT NULL,
                 setup_is_finished integer NOT NULL,
-                greeting text
+                greeting text,
+                language text
             ); """
 curs.execute(table)
 conn.commit()
@@ -196,6 +197,9 @@ def button_callback_handler(call):
 
         if 'forecast' in call.data or 'weather' in call.data:
             Weather.call_handler(call)
+
+        if 'lang' in call.data:
+            introduction.call_handler(call)
 
     except Exception:
         bot.reply_to(call.message, 'Упс... Что-то пошло не так')
