@@ -88,6 +88,30 @@ def set_greeting(message):
         bot.send_message(chat_id=message.chat.id, text='Упс... Что-то пошло не так')
 
 
+def rm_greeting(message):
+    try:
+        member = bot.get_chat_member(chat_id=message.chat.id,
+                                     user_id=message.from_user.id)
+        if member.status == 'creator' or member.status == 'administrator':
+            try:
+                conn = sqlite3.connect('data.db')
+                curs = conn.cursor()
+                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
+                result = curs.fetchall()
+                if result[0][0] == 1:
+                    curs.execute("""UPDATE chats
+                                    SET greeting = ?
+                                    WHERE chat_id = ?""", ('', message.chat.id))
+                    conn.commit()
+                    bot.reply_to(message, 'Приветствие успешно удалено!')
+
+                conn.close()
+            except Exception:
+                bot.reply_to(message, 'Не пройдена настройка!')
+    except Exception:
+        bot.send_message(chat_id=message.chat.id, text='Упс... Что-то пошло не так')
+
+
 def call_handler(call):
     try:
         timers[call.from_user.id].cancel()

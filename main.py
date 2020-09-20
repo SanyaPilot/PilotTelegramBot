@@ -51,6 +51,11 @@ def set_greeting(message):
     Greeting.set_greeting(message)
 
 
+@bot.message_handler(commands=['rmgreeting'])
+def rm_greeting(message):
+    Greeting.rm_greeting(message)
+
+
 # Мут навсегда
 @bot.message_handler(commands=['mute'])
 def mute_wrapper(message):
