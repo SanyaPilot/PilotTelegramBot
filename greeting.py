@@ -17,13 +17,8 @@ def greeting(message):
         conn.close()
         try:
             row = result[0]
-            if row[2] == 1 and row[3]:
-                #text = 'Привет, как дела?\nЗдесь мы осуждаем телефон LeEco Le 2 (ну или не совсем)\nВ общем не '
-                #text += 'разжигай холивары и все будет ок)\n\nНо перед тем как ты вступишь в чат, нам нужно проверить,'
-                #text += ' действительно ли ты не бот. Для этого нужно нажать на кнопку, я думаю ты справишся\n\n'
-                #text += '<i><b>Ограничение по времени: 5 минут.\n'
-                #text += 'Если по истечении времени не была нажата кнопка, ты получаешь кик</b></i>'
-
+            new_user = message.new_chat_members[0]
+            if row[2] == 1 and row[3] and not new_user.is_bot:
                 keyboard = types.InlineKeyboardMarkup()
                 key = types.InlineKeyboardButton(text='Я хочу общаться!', callback_data='captcha_ok')
                 keyboard.add(key)
@@ -33,6 +28,11 @@ def greeting(message):
                                  parse_mode='HTML',
                                  text=row[3],
                                  reply_markup=keyboard)
+
+                bot.restrict_chat_member(chat_id=message.chat.id,
+                                         user_id=new_user.id,
+                                         can_send_messages=False,
+                                         until_date=0)
 
                 global timers
                 timers[message.from_user.id] = Timer(300.0, kick_bot, [message.chat.id, message.from_user.id])
@@ -91,6 +91,18 @@ def set_greeting(message):
 def call_handler(call):
     try:
         timers[call.from_user.id].cancel()
+
+        chat = bot.get_chat(chat_id=call.message.chat.id)
+        perms = chat.permissions
+        bot.restrict_chat_member(chat_id=call.message.chat.id,
+                                 user_id=call.from_user.id,
+                                 can_send_messages=True,
+                                 can_send_media_messages=perms.can_send_media_messages,
+                                 can_send_polls=perms.can_send_polls,
+                                 can_send_other_messages=perms.can_send_other_messages,
+                                 can_add_web_page_previews=perms.can_add_web_page_previews,
+                                 until_date=0)
+
         bot.edit_message_text(chat_id=call.message.chat.id,
                               message_id=call.message.message_id,
                               text='Вы успешно прошли проверку!')
