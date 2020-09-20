@@ -86,12 +86,12 @@ def demote(message):
         if member.status == 'creator' or member.status == 'administrator':
             bot.promote_chat_member(chat_id=message.chat.id,
                                     user_id=message.reply_to_message.from_user.id,
-                                    can_pin_messages=True,
-                                    can_change_info=True,
-                                    can_invite_users=True,
-                                    can_delete_messages=True,
-                                    can_promote_members=True,
-                                    can_restrict_members=True
+                                    can_pin_messages=False,
+                                    can_change_info=False,
+                                    can_invite_users=False,
+                                    can_delete_messages=False,
+                                    can_promote_members=False,
+                                    can_restrict_members=False
                                     )
             bot.send_message(chat_id=message.chat.id,
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
