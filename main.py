@@ -24,6 +24,14 @@ table = """ CREATE TABLE IF NOT EXISTS notes (
                 chat_id integer NOT NULL
             ); """
 curs.execute(table)
+
+table = """ CREATE TABLE IF NOT EXISTS chats (
+                id integer PRIMARY KEY,
+                chat_id integer NOT NULL,
+                setup_is_finished integer NOT NULL,
+                greeting text
+            ); """
+curs.execute(table)
 conn.commit()
 conn.close()
 
@@ -36,6 +44,11 @@ def start_wrapper(message):
 @bot.message_handler(commands=['help'])
 def help_wrapper(message):
     introduction.help(message)
+
+
+@bot.message_handler(commands=['setgreeting'])
+def set_greeting(message):
+    Greeting.set_greeting(message)
 
 
 # Мут навсегда

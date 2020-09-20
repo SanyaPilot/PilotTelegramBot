@@ -1,2 +1,2 @@
 # Configuration file
-token = 'put here your token'
+token = 'put your token here'

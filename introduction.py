@@ -1,12 +1,18 @@
 import telebot
 import config
+import sqlite3
+
 bot = telebot.TeleBot(config.token)
 
 
 def start(message):
-    bot.send_message(message.chat.id, 'Приветствую) Я бот-админ для чата.\nСправку по'
-                                      ' командам можно получить по команде /help@sanya_pilot_bot\nЕсли что-то не '
-                                      'работает, пните @alexander_baransky496\n')
+    conn = sqlite3.connect('data.db')
+    curs = conn.cursor()
+    bot.send_message(message.chat.id, 'Приветствую) Я бот-админ для чата.\nС этого момента я буду помогать в этом '
+                                      'чате\nДля корректной работы необходимо выдать административные привилегии боту')
+    curs.execute('INSERT INTO chats(chat_id, setup_is_finished) VALUES(?,?)', (message.chat.id, 1))
+    conn.commit()
+    conn.close()
 
 
 def help(message):
