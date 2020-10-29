@@ -1,5 +1,6 @@
 import telebot
 import config
+import universal
 bot = telebot.TeleBot(config.token)
 
 
@@ -19,7 +20,7 @@ def restrict(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def permit(message):
@@ -46,7 +47,7 @@ def permit(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def permit_default(message):
@@ -75,7 +76,7 @@ def permit_default(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 # Убрать все права
@@ -100,7 +101,7 @@ def demote(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 # Дать все права
@@ -125,4 +126,4 @@ def promote(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)

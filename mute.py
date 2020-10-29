@@ -1,5 +1,6 @@
 import telebot
 import config
+import universal
 import time
 bot = telebot.TeleBot(config.token)
 
@@ -23,7 +24,7 @@ def mute(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 # Мут на время
@@ -88,7 +89,7 @@ def tmute(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 # Размут
@@ -114,4 +115,4 @@ def unmute(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)

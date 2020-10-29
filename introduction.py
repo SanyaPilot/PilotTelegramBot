@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 import config
+import universal
 import sqlite3
 
 bot = telebot.TeleBot(config.token)
@@ -11,16 +12,19 @@ def start(message):
     curs = conn.cursor()
     curs.execute('INSERT INTO chats(chat_id, setup_is_finished) VALUES(?,?)', (message.chat.id, 0))
     conn.commit()
-    conn.close()
-    # bot.send_message(message.chat.id, 'Приветствую) Я бот-админ для чата.\nС этого момента я буду помогать в этом '
-    #                                  'чате\nДля корректной работы необходимо выдать административные привилегии боту')
+
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     key_rus = types.InlineKeyboardButton(text='Русский \ud83c\uddf7\ud83c\uddfa', callback_data='lang_rus')
     key_eng = types.InlineKeyboardButton(text='English \ud83c\uddec\ud83c\udde7', callback_data='lang_eng')
     keyboard.add(key_rus, key_eng)
     # key_close = types.InlineKeyboardButton(text='Next >>', callback_data='setup_next')
     # keyboard.add(key_close)
-
+    curs.execute("""UPDATE chats
+                    SET language = ?,
+                        setup_is_finished = ?
+                    WHERE chat_id = ?""", ('eng', 1, message.chat.id))
+    conn.commit()
+    conn.close()
     bot.send_message(message.chat.id, "Hello! I'm chat admin bot.\nFrom this moment I'll help in this chat\n"
                                       "For correct work you should give administrative privileges to me\n"
                                       "Please choose language. This will affect all messages from the bot",
@@ -154,5 +158,4 @@ def call_handler(call):
             bot.answer_callback_query(callback_query_id=call.id,
                                       text='You need administrative privileges to do this')
     except Exception:
-        bot.answer_callback_query(callback_query_id=call.id,
-                                  text='Oops... Something went wrong')
+        universal.error_call(call)

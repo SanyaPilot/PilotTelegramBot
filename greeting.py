@@ -1,5 +1,6 @@
 import telebot
 import config
+import universal
 from telebot import types
 from threading import Timer
 import sqlite3
@@ -40,7 +41,7 @@ def greeting(message):
         except IndexError:
             pass
     except Exception:
-        bot.send_message(chat_id=message.chat.id, text='Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def kick_bot(chat_id, user_id):
@@ -85,7 +86,7 @@ def set_greeting(message):
             except Exception:
                 bot.reply_to(message, 'Не пройдена настройка!')
     except Exception:
-        bot.send_message(chat_id=message.chat.id, text='Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def rm_greeting(message):
@@ -109,7 +110,7 @@ def rm_greeting(message):
             except Exception:
                 bot.reply_to(message, 'Не пройдена настройка!')
     except Exception:
-        bot.send_message(chat_id=message.chat.id, text='Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def call_handler(call):

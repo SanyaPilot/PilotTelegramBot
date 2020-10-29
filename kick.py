@@ -1,5 +1,6 @@
 import telebot
 import config
+import universal
 bot = telebot.TeleBot(config.token)
 
 
@@ -21,7 +22,7 @@ def kick(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def kickme(message):
@@ -37,4 +38,4 @@ def kickme(message):
                               ' был кикнут\nОн сможет вернуться в чат в будущем')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)

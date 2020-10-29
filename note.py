@@ -1,5 +1,6 @@
 import telebot
 import config
+import universal
 import sqlite3
 
 bot = telebot.TeleBot(config.token)
@@ -26,7 +27,7 @@ def notes(message):
         bot.reply_to(message, text)
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def note(message):
@@ -48,7 +49,7 @@ def note(message):
         bot.forward_message(message.chat.id, message.chat.id, row[0])
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def addnote(message):
@@ -72,7 +73,7 @@ def addnote(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def delnote(message):
@@ -96,7 +97,7 @@ def delnote(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def text_handler(message):

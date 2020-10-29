@@ -1,5 +1,6 @@
 import telebot
 import config
+import universal
 from telebot import types
 import requests
 import json
@@ -7,7 +8,7 @@ import time
 from geopy.geocoders import Nominatim
 
 bot = telebot.TeleBot(config.token)
-geolocator = Nominatim(user_agent="sanya_pilot_telegram_bot")
+geolocator = Nominatim(user_agent="pilot_telegram_bot")
 
 forecasts = {}
 weathers = {}
@@ -22,8 +23,8 @@ def weather(message):
             bot.reply_to(message, 'Такой город не найден')
         else:
             weather_message = bot.send_message(chat_id=message.chat.id,
-                                                text='Готовлю прогноз погоды для Вас',
-                                                reply_to_message_id=message.message_id)
+                                               text='Готовлю прогноз погоды для Вас',
+                                               reply_to_message_id=message.message_id)
 
             global weathers
             weathers[weather_message.message_id] = message.from_user.id
@@ -46,7 +47,8 @@ def weather(message):
             text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
             text += '<b>Текущая погода</b>\n'
             text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
-            text += '<b>' + str(data['current']['temp']) + ' °C <i>' + data['current']['weather'][0]['description'].capitalize() + '</i></b>\n'
+            text += '<b>' + str(data['current']['temp']) + ' °C <i>' + data['current']['weather'][0][
+                'description'].capitalize() + '</i></b>\n'
             text += '<i>Чувствуется как:</i> <b>' + str(data['current']['feels_like']) + ' °C</b>\n'
             text += '<i>Влажность:</i> <b>' + str(data['current']['humidity']) + '%</b>\n'
             text += '<i>Давление:</i> <b>' + str(data['current']['pressure']) + ' гПа</b>\n'
@@ -65,7 +67,7 @@ def weather(message):
                                   reply_markup=keyboard)
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def forecast(message):
@@ -102,7 +104,8 @@ def forecast(message):
                 text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
                 text += '<b>Прогноз на ' + time.strftime("%d/%m", time.gmtime(data['daily'][i]['dt'])) + '</b>\n'
                 text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
-                text += '<b>' + str(data['daily'][i]['temp']['day']) + ' °C <i>' + data['daily'][i]['weather'][0]['description'].capitalize() + '</i></b>\n'
+                text += '<b>' + str(data['daily'][i]['temp']['day']) + ' °C <i>' + data['daily'][i]['weather'][0][
+                    'description'].capitalize() + '</i></b>\n'
                 text += '<i>Мин. температура:</i> <b>' + str(data['daily'][i]['temp']['min']) + ' °C</b>\n'
                 text += '<i>Макс. температура:</i> <b>' + str(data['daily'][i]['temp']['max']) + ' °C</b>\n'
                 text += '<i>Температура утром:</i> <b>' + str(data['daily'][i]['temp']['morn']) + ' °C</b>\n'
@@ -133,7 +136,7 @@ def forecast(message):
                                   reply_markup=keyboard)
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def call_handler(call):

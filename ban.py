@@ -1,6 +1,7 @@
 import telebot
 import time
 import config
+import universal
 bot = telebot.TeleBot(config.token)
 
 
@@ -20,7 +21,7 @@ def ban(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def banme(message):
@@ -34,7 +35,7 @@ def banme(message):
                               ' был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def tban(message):
@@ -97,7 +98,7 @@ def tban(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
 
 
 def unban(message):
@@ -115,4 +116,4 @@ def unban(message):
             bot.reply_to(message, 'Для этого нужны админские права')
 
     except Exception:
-        bot.reply_to(message, 'Упс... Что-то пошло не так')
+        universal.error_msg(message)
