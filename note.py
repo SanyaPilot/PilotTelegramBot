@@ -16,13 +16,13 @@ def notes(message):
         curs.execute(cmd, (message.chat.id,))
         rows = curs.fetchall()
         conn.close()
-        text = '┏━━━━━━━━━━━━━━━━━━━━━━\n┣Список заметок:\n┃\n'
+        text = '┏━━━━━━━━━━━━━━━━━━━━\n┣Список заметок:\n┃\n'
         for row in rows:
             text += '┣['
             text += row[0]
             text += '\n'
 
-        text += '┗━━━━━━━━━━━━━━━━━━━━━━\n'
+        text += '┗━━━━━━━━━━━━━━━━━━━━\n'
         text += 'Вы можете просмотреть заметку командой /note <имя-заметки> либо при помощи #<имя-заметки>'
         bot.reply_to(message, text)
 

@@ -14,9 +14,9 @@ def ban(message):
                                  user_id=message.reply_to_message.from_user.id,
                                  until_date=0)
 
+            username = str(message.reply_to_message.from_user.username)
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
+                             text=f'Пользователь @{username} был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
         else:
             universal.admin_error_msg(message)
 
@@ -30,9 +30,10 @@ def banme(message):
                              user_id=message.from_user.id,
                              until_date=0)
 
+        username = str(message.from_user.username)
+        msg = 'Пользователь @{username} был забанен\nОн больше НЕ сможет вернуться в чат в будущем'
         bot.send_message(chat_id=message.chat.id,
-                         text='Пользователь @' + str(message.from_user.username) +
-                              ' был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
+                         text=msg.format(username=username))
 
     except Exception:
         universal.error_msg(message)
