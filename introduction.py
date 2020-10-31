@@ -155,7 +155,6 @@ def call_handler(call):
                                       reply_markup=keyboard)
 
         else:
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text='You need administrative privileges to do this')
+            universal.admin_error_call(call)
     except Exception:
         universal.error_call(call)

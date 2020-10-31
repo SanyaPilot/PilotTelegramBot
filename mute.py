@@ -21,7 +21,7 @@ def mute(message):
                                   str(message.reply_to_message.from_user.username) + ' навсегда')
 
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -86,7 +86,7 @@ def tmute(message):
                                  message.reply_to_message.from_user.username) + ' на ' + timeout_text)
 
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -112,7 +112,7 @@ def unmute(message):
                              text='Мут был снят с пользователя @' + str(
                                  message.reply_to_message.from_user.username))
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)

@@ -62,7 +62,7 @@ def kick_bot(chat_id, user_id):
         timers.pop(user_id)
 
     except Exception:
-        bot.send_message(chat_id=chat_id, text='Упс... Что-то пошло не так')
+        pass
 
 
 def set_greeting(message):
@@ -85,6 +85,8 @@ def set_greeting(message):
                 conn.close()
             except Exception:
                 bot.reply_to(message, 'Не пройдена настройка!')
+        else:
+            universal.admin_error_msg(message)
     except Exception:
         universal.error_msg(message)
 
@@ -109,6 +111,8 @@ def rm_greeting(message):
                 conn.close()
             except Exception:
                 bot.reply_to(message, 'Не пройдена настройка!')
+        else:
+            universal.admin_error_msg(message)
     except Exception:
         universal.error_msg(message)
 

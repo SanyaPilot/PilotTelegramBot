@@ -17,7 +17,7 @@ def restrict(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был лишен прав')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -44,7 +44,7 @@ def permit(message):
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
                                   ' были выданы полные пользовательские права (не путать с админкой)')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -73,7 +73,7 @@ def permit_default(message):
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
                                   ' были выданы дефолтные права')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -98,7 +98,7 @@ def demote(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был лишен всех админских прав')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -123,7 +123,7 @@ def promote(message):
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
                                   ' были выданы полные админские права')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)

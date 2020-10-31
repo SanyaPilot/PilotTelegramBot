@@ -70,7 +70,7 @@ def addnote(message):
 
             bot.reply_to(message, 'Заметка была добавлена')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
@@ -94,7 +94,7 @@ def delnote(message):
 
             bot.reply_to(message, 'Заметка была удалена')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)

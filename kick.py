@@ -19,7 +19,7 @@ def kick(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был кикнут\nОн сможет вернуться в чат в будущем')
         else:
-            bot.reply_to(message, 'Для этого нужны админские права')
+            universal.admin_error_msg(message)
 
     except Exception:
         universal.error_msg(message)
