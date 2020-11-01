@@ -1,10 +1,11 @@
 import telebot
 import config
-import translation
+from translation import tw
 bot = telebot.TeleBot(config.token)
 
 
 def restrict(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -14,16 +15,16 @@ def restrict(message):
                                      until_date=0)
 
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был лишен прав')
+                             text=trans['perms']['restrict'].format(username=str(message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def permit(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -41,16 +42,16 @@ def permit(message):
                                      until_date=0)
 
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователю @' + str(message.reply_to_message.from_user.username) +
-                                  ' были выданы полные пользовательские права (не путать с админкой)')
+                             text=trans['perms']['permit'].format(username=str(message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def permit_default(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -70,17 +71,18 @@ def permit_default(message):
                                      until_date=0)
 
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователю @' + str(message.reply_to_message.from_user.username) +
-                                  ' были выданы дефолтные права')
+                             text=trans['perms']['permit_default'].format(username=str(
+                                                                        message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 # Убрать все права
 def demote(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -95,17 +97,18 @@ def demote(message):
                                     can_restrict_members=False
                                     )
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был лишен всех админских прав')
+                             text=trans['perms']['demote'].format(username=str(
+                                                                        message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 # Дать все права
 def promote(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -120,10 +123,10 @@ def promote(message):
                                     can_restrict_members=True
                                     )
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователю @' + str(message.reply_to_message.from_user.username) +
-                                  ' были выданы полные админские права')
+                             text=trans['perms']['promote'].format(username=str(
+                                                                        message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
