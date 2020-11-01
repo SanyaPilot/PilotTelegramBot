@@ -1,12 +1,13 @@
 import telebot
 import config
-import translation
+from translation import tw
 import sqlite3
 
 bot = telebot.TeleBot(config.token)
 
 
 def notes(message):
+    trans = tw.get_translation(message)
     try:
         cmd = """ SELECT name FROM notes
                   WHERE chat_id = ?"""
@@ -16,21 +17,22 @@ def notes(message):
         curs.execute(cmd, (message.chat.id,))
         rows = curs.fetchall()
         conn.close()
-        text = '┏━━━━━━━━━━━━━━━━━━━━\n┣Список заметок:\n┃\n'
+        text = '┏━━━━━━━━━━━━━━━━━━━\n┣' + trans['note']['notes']['list'] + '\n┃\n'
         for row in rows:
             text += '┣['
             text += row[0]
             text += '\n'
 
-        text += '┗━━━━━━━━━━━━━━━━━━━━\n'
-        text += 'Вы можете просмотреть заметку командой /note <имя-заметки> либо при помощи #<имя-заметки>'
+        text += '┗━━━━━━━━━━━━━━━━━━━\n'
+        text += trans['note']['notes']['instruction']
         bot.reply_to(message, text)
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def note(message):
+    trans = tw.get_translation(message)
     try:
         words = message.text.split()
         name = words[1]
@@ -49,10 +51,11 @@ def note(message):
         bot.forward_message(message.chat.id, message.chat.id, row[0])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def addnote(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -68,15 +71,16 @@ def addnote(message):
             conn.commit()
             conn.close()
 
-            bot.reply_to(message, 'Заметка была добавлена')
+            bot.reply_to(message, trans['note']['addnote'])
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def delnote(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -92,12 +96,12 @@ def delnote(message):
             conn.commit()
             conn.close()
 
-            bot.reply_to(message, 'Заметка была удалена')
+            bot.reply_to(message, trans['note']['delnote'])
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def text_handler(message):
