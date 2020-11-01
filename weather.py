@@ -1,6 +1,6 @@
 import telebot
 import config
-import translation
+from translation import tw
 from telebot import types
 import requests
 import json
@@ -15,15 +15,16 @@ weathers = {}
 
 
 def weather(message):
+    trans = tw.get_translation(message)
     try:
         words = message.text.split()
         city_name = words[1]
         loc = geolocator.geocode(city_name)
         if loc is None:
-            bot.reply_to(message, 'Такой город не найден')
+            bot.reply_to(message, trans['weather']['city_not_found_err'])
         else:
             weather_message = bot.send_message(chat_id=message.chat.id,
-                                               text='Готовлю прогноз погоды для Вас',
+                                               text=trans['weather']['making_forecast'],
                                                reply_to_message_id=message.message_id)
 
             global weathers
@@ -36,28 +37,29 @@ def weather(message):
             data = json.loads(response.content)
             destination = loc.address.split(',')
 
-            text = '<b><i>Погода в '
+            dest = ''
             for i in destination:
                 if i == destination[0]:
-                    text += i
+                    dest += i
                 else:
-                    text += ',' + i
+                    dest += ',' + i
 
-            text += '</i></b>\n'
-            text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
-            text += '<b>Текущая погода</b>\n'
-            text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
+            text = trans['weather']['weather_in'].format(city=dest) + '\n'
+            text += '━━━━━━━━━━━━━━━━━━━━\n'
+            text += trans['weather']['weather']['current_weather'] + '\n'
+            text += '━━━━━━━━━━━━━━━━━━━━\n'
             text += '<b>' + str(data['current']['temp']) + ' °C <i>' + data['current']['weather'][0][
                 'description'].capitalize() + '</i></b>\n'
-            text += '<i>Чувствуется как:</i> <b>' + str(data['current']['feels_like']) + ' °C</b>\n'
-            text += '<i>Влажность:</i> <b>' + str(data['current']['humidity']) + '%</b>\n'
-            text += '<i>Давление:</i> <b>' + str(data['current']['pressure']) + ' гПа</b>\n'
-            text += '<i>Скорость ветра:</i> <b>' + str(data['current']['wind_speed']) + ' м/с</b>\n'
-            text += '<i>Облачность:</i> <b>' + str(data['current']['clouds']) + '%</b>\n'
-            text += '<i>UV индекс:</i> <b>' + str(data['current']['uvi']) + '</b>\n'
+            text += trans['weather']['weather']['feels_like'].format(
+                feels_like=str(data['current']['feels_like'])) + '\n'
+            text += trans['weather']['humidity'].format(humidity=str(data['current']['humidity'])) + '\n'
+            text += trans['weather']['pressure'].format(pressure=str(data['current']['pressure'])) + '\n'
+            text += trans['weather']['wind_speed'].format(wind_speed=str(data['current']['wind_speed'])) + '\n'
+            text += trans['weather']['cloudiness'].format(cloudiness=str(data['current']['clouds'])) + '\n'
+            text += trans['weather']['uvi'].format(uvi=str(data['current']['uvi']))
 
             keyboard = types.InlineKeyboardMarkup()
-            key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='weather_close')
+            key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'], callback_data='weather_close')
             keyboard.add(key_close)
 
             bot.edit_message_text(chat_id=message.chat.id,
@@ -67,19 +69,20 @@ def weather(message):
                                   reply_markup=keyboard)
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def forecast(message):
+    trans = tw.get_translation(message)
     try:
         words = message.text.split()
         city_name = words[1]
         loc = geolocator.geocode(city_name)
         if loc is None:
-            bot.reply_to(message, 'Такой город не найден')
+            bot.reply_to(message, trans['weather']['city_not_found_err'])
         else:
             forecast_message = bot.send_message(chat_id=message.chat.id,
-                                                text='Готовлю прогноз погоды для Вас',
+                                                text=trans['weather']['making_forecast'],
                                                 reply_to_message_id=message.message_id)
 
             global forecasts
@@ -93,29 +96,34 @@ def forecast(message):
             destination = loc.address.split(',')
 
             for i in range(8):
-                text = '<b><i>Погода в '
+                dest = ''
                 for j in destination:
                     if j == destination[0]:
-                        text += j
+                        dest += j
                     else:
-                        text += ',' + j
+                        dest += ',' + j
 
-                text += '</i></b>\n'
-                text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
-                text += '<b>Прогноз на ' + time.strftime("%d/%m", time.gmtime(data['daily'][i]['dt'])) + '</b>\n'
-                text += '━━━━━━━━━━━━━━━━━━━━━━━\n'
+                text = trans['weather']['weather_in'].format(city=dest) + '\n'
+                text += '━━━━━━━━━━━━━━━━━━━━\n'
+                text += trans['weather']['forecast']['forecast_for'].format(time=time.strftime("%d/%m", time.gmtime(data['daily'][i]['dt']))) + '\n'
+                text += '━━━━━━━━━━━━━━━━━━━━\n'
                 text += '<b>' + str(data['daily'][i]['temp']['day']) + ' °C <i>' + data['daily'][i]['weather'][0][
                     'description'].capitalize() + '</i></b>\n'
-                text += '<i>Мин. температура:</i> <b>' + str(data['daily'][i]['temp']['min']) + ' °C</b>\n'
-                text += '<i>Макс. температура:</i> <b>' + str(data['daily'][i]['temp']['max']) + ' °C</b>\n'
-                text += '<i>Температура утром:</i> <b>' + str(data['daily'][i]['temp']['morn']) + ' °C</b>\n'
-                text += '<i>Температура вечером:</i> <b>' + str(data['daily'][i]['temp']['eve']) + ' °C</b>\n'
-                text += '<i>Температура ночью:</i> <b>' + str(data['daily'][i]['temp']['night']) + ' °C</b>\n'
-                text += '<i>Влажность:</i> <b>' + str(data['daily'][i]['humidity']) + '%</b>\n'
-                text += '<i>Давление:</i> <b>' + str(data['daily'][i]['pressure']) + ' гПа</b>\n'
-                text += '<i>Скорость ветра:</i> <b>' + str(data['daily'][i]['wind_speed']) + ' м/с</b>\n'
-                text += '<i>Облачность:</i> <b>' + str(data['daily'][i]['clouds']) + '%</b>\n'
-                text += '<i>UV индекс:</i> <b>' + str(data['daily'][i]['uvi']) + '</b>'
+                text += trans['weather']['forecast']['min_temp'].format(
+                    min_temp=str(data['daily'][i]['temp']['min']))+'\n'
+                text += trans['weather']['forecast']['max_temp'].format(
+                    max_temp=str(data['daily'][i]['temp']['max']))+'\n'
+                text += trans['weather']['forecast']['morn_temp'].format(
+                    morn_temp=str(data['daily'][i]['temp']['morn']))+'\n'
+                text += trans['weather']['forecast']['eve_temp'].format(
+                    eve_temp=str(data['daily'][i]['temp']['eve']))+'\n'
+                text += trans['weather']['forecast']['night_temp'].format(
+                    night_temp=str(data['daily'][i]['temp']['night']))+'\n'
+                text += trans['weather']['humidity'].format(humidity=str(data['current']['humidity'])) + '\n'
+                text += trans['weather']['pressure'].format(pressure=str(data['current']['pressure'])) + '\n'
+                text += trans['weather']['wind_speed'].format(wind_speed=str(data['current']['wind_speed'])) + '\n'
+                text += trans['weather']['cloudiness'].format(cloudiness=str(data['current']['clouds'])) + '\n'
+                text += trans['weather']['uvi'].format(uvi=str(data['current']['uvi']))
 
                 forecasts[forecast_message.message_id].append(text)
 
@@ -126,7 +134,8 @@ def forecast(message):
             key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
             key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
             keyboard.add(key_prev, key_next)
-            key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='forecast_close')
+            key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'],
+                                               callback_data='forecast_close')
             keyboard.add(key_close)
 
             bot.edit_message_text(chat_id=message.chat.id,
@@ -136,10 +145,11 @@ def forecast(message):
                                   reply_markup=keyboard)
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def call_handler(call):
+    trans = tw.get_translation(call)
     if call.data == 'forecast_prev':
         if call.from_user.id == forecasts[call.message.message_id][9]:
             if not forecasts[call.message.message_id][8] <= 0:
@@ -148,7 +158,8 @@ def call_handler(call):
                 key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
                 key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
                 keyboard.add(key_prev, key_next)
-                key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='forecast_close')
+                key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'],
+                                                       callback_data='forecast_close')
                 keyboard.add(key_close)
 
                 bot.edit_message_text(chat_id=call.message.chat.id,
@@ -158,10 +169,10 @@ def call_handler(call):
                                       reply_markup=keyboard)
             else:
                 bot.answer_callback_query(callback_query_id=call.id,
-                                          text='Это начало списка')
+                                          text=trans['weather']['forecast']['start_of_list'])
         else:
             bot.answer_callback_query(callback_query_id=call.id,
-                                      text='Нельзя управлять меню прогноза погоды другого пользователя')
+                                      text=trans['weather']['forecast']['other_user_err'])
 
     elif call.data == 'forecast_next':
         if call.from_user.id == forecasts[call.message.message_id][9]:
@@ -171,7 +182,8 @@ def call_handler(call):
                 key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
                 key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
                 keyboard.add(key_prev, key_next)
-                key_close = types.InlineKeyboardButton(text='Я прочитал', callback_data='forecast_close')
+                key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'],
+                                                       callback_data='forecast_close')
                 keyboard.add(key_close)
 
                 bot.edit_message_text(chat_id=call.message.chat.id,
@@ -181,10 +193,10 @@ def call_handler(call):
                                       reply_markup=keyboard)
             else:
                 bot.answer_callback_query(callback_query_id=call.id,
-                                          text='Это конец списка')
+                                          text=trans['weather']['forecast']['end_of_list'])
         else:
             bot.answer_callback_query(callback_query_id=call.id,
-                                      text='Нельзя управлять меню прогноза погоды другого пользователя')
+                                      text=trans['weather']['forecast']['other_user_err'])
 
     elif call.data == 'forecast_close':
         if call.from_user.id == forecasts[call.message.message_id][9]:
@@ -192,7 +204,7 @@ def call_handler(call):
             bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         else:
             bot.answer_callback_query(callback_query_id=call.id,
-                                      text='Нельзя управлять меню прогноза погоды другого пользователя')
+                                      text=trans['weather']['forecast']['other_user_err'])
 
     elif call.data == 'weather_close':
         if call.from_user.id == weathers[call.message.message_id]:
@@ -200,4 +212,4 @@ def call_handler(call):
             bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         else:
             bot.answer_callback_query(callback_query_id=call.id,
-                                      text='Нельзя управлять меню прогноза погоды другого пользователя')
+                                      text=trans['weather']['forecast']['other_user_err'])

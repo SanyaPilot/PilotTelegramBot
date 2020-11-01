@@ -59,11 +59,12 @@
   },
   "weather": {
     "city_not_found_err": "Такой город не найден",
+    "making_forecast": "Готовлю прогноз погоды для Вас",
     "weather_in": "<b><i>Погода в {city}</i></b>",
     "humidity": "<i>Влажность:</i> <b>{humidity}%</b>",
     "pressure": "<i>Давление:</i> <b>{pressure} гПа</b>",
     "wind_speed": "<i>Скорость ветра:</i> <b>{wind_speed} м/с</b>",
-    "cloudness": "<i>Облачность:</i> <b>{cloudness}%</b>",
+    "cloudiness": "<i>Облачность:</i> <b>{cloudiness}%</b>",
     "uvi": "<i>UV индекс:</i> <b>{uvi}</b>",
     "close_button": "Я прочитал",
     "weather": {
