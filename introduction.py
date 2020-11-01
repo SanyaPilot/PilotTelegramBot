@@ -66,7 +66,6 @@ def call_handler(call):
                                      user_id=call.message.from_user.id)
 
         if member.status == 'creator' or member.status == 'administrator':
-            print(call.data[5:])
             curs.execute("""UPDATE chats
                             SET language = ?,
                                 setup_is_finished = ?

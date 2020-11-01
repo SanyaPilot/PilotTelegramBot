@@ -20,7 +20,6 @@ class TranslationWorker:
         print('Translations loaded')
 
     def get_translation(self, data):
-        print(data)
         return self.translations[self.get_lang(data)]
 
     def get_labels(self):
