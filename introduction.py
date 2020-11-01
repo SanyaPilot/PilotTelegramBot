@@ -14,9 +14,10 @@ def start(message):
     conn.commit()
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
-    key_rus = types.InlineKeyboardButton(text='Русский \ud83c\uddf7\ud83c\uddfa', callback_data='lang_rus')
-    key_eng = types.InlineKeyboardButton(text='English \ud83c\uddec\ud83c\udde7', callback_data='lang_eng')
-    keyboard.add(key_rus, key_eng)
+    for i in universal.tw.available:
+        name = i.split('.')[0]
+        keyboard.add(types.InlineKeyboardButton(text=universal.tw.get_labels()[name], callback_data=f'lang_{name}'))
+
     # key_close = types.InlineKeyboardButton(text='Next >>', callback_data='setup_next')
     # keyboard.add(key_close)
     curs.execute("""UPDATE chats
