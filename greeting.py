@@ -1,6 +1,6 @@
 import telebot
 import config
-import translation
+from translation import tw
 from telebot import types
 from threading import Timer
 import sqlite3
@@ -10,6 +10,7 @@ timers = {}
 
 
 def greeting(message):
+    trans = tw.get_translation(message)
     try:
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
@@ -21,7 +22,7 @@ def greeting(message):
             new_user = message.new_chat_members[0]
             if row[2] == 1 and row[3] and not new_user.is_bot:
                 keyboard = types.InlineKeyboardMarkup()
-                key = types.InlineKeyboardButton(text='Я хочу общаться!', callback_data='captcha_ok')
+                key = types.InlineKeyboardButton(text=trans['greeting']['greeting'], callback_data='captcha_ok')
                 keyboard.add(key)
 
                 bot.send_message(chat_id=message.chat.id,
@@ -36,15 +37,16 @@ def greeting(message):
                                          until_date=0)
 
                 global timers
-                timers[message.from_user.id] = Timer(300.0, kick_bot, [message.chat.id, message.from_user.id])
+                timers[message.from_user.id] = Timer(300.0, kick_bot, [message.chat.id, message.from_user.id, message])
                 timers[message.from_user.id].start()
         except IndexError:
             pass
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
-def kick_bot(chat_id, user_id):
+def kick_bot(chat_id, user_id, message):
+    trans = tw.get_translation(message)
     try:
         bot.kick_chat_member(chat_id=chat_id,
                              user_id=user_id,
@@ -56,8 +58,7 @@ def kick_bot(chat_id, user_id):
         chat_member = bot.get_chat_member(chat_id=chat_id, user_id=user_id)
         user = chat_member.user
         bot.send_message(chat_id=chat_id,
-                         text='Пользователь @' + str(user.username) +
-                              ' не прошел проверку на бота\nОн был кикнут')
+                         text=trans['greeting']['kick_bot'].format(username=str(user.username)))
         global timers
         timers.pop(user_id)
 
@@ -66,6 +67,7 @@ def kick_bot(chat_id, user_id):
 
 
 def set_greeting(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -80,18 +82,19 @@ def set_greeting(message):
                                     SET greeting = ?
                                     WHERE chat_id = ?""", (message.reply_to_message.text, message.chat.id))
                     conn.commit()
-                    bot.reply_to(message, 'Приветствие успешно установлено!')
+                    bot.reply_to(message, trans['greeting']['set_greeting'])
 
                 conn.close()
             except Exception:
-                bot.reply_to(message, 'Не пройдена настройка!')
+                bot.reply_to(message, trans['global']['errors']['setup'])
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def rm_greeting(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -106,18 +109,19 @@ def rm_greeting(message):
                                     SET greeting = ?
                                     WHERE chat_id = ?""", ('', message.chat.id))
                     conn.commit()
-                    bot.reply_to(message, 'Приветствие успешно удалено!')
+                    bot.reply_to(message, trans['greeting']['rm_greeting'])
 
                 conn.close()
             except Exception:
-                bot.reply_to(message, 'Не пройдена настройка!')
+                bot.reply_to(message, trans['global']['errors']['setup'])
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def call_handler(call):
+    trans = tw.get_translation(call)
     try:
         timers[call.from_user.id].cancel()
 
@@ -134,8 +138,8 @@ def call_handler(call):
 
         bot.edit_message_text(chat_id=call.message.chat.id,
                               message_id=call.message.message_id,
-                              text='Вы успешно прошли проверку!')
+                              text=trans['greeting']['check_success'])
         timers.pop(call.from_user.id)
     except KeyError:
         bot.answer_callback_query(callback_query_id=call.id,
-                                  text='Нельзя проходить проверку за другого пользователя')
+                                  text=trans['greeting']['other_user_err'])
