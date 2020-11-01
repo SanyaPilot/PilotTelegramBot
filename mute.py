@@ -1,12 +1,13 @@
 import telebot
 import config
-import translation
+from translation import tw
 import time
 bot = telebot.TeleBot(config.token)
 
 
 # Мут навсегда
 def mute(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -17,18 +18,18 @@ def mute(message):
                                      until_date=0)
 
             bot.send_message(chat_id=message.chat.id,
-                             text='Мут был дан пользователю @' +
-                                  str(message.reply_to_message.from_user.username) + ' навсегда')
+                             text=trans['mute']['mute'].format(username=str(message.reply_to_message.from_user.username)))
 
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 # Мут на время
 def tmute(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -39,42 +40,61 @@ def tmute(message):
             timeout_numbers = timeout[:-1]
             final_timeout = None
             timeout_text = None
-            if timeout_units == 's':
-                final_timeout = int(timeout_numbers)
-                if int(timeout_numbers[-1:]) == 1:
-                    text = ' секунду'
-                elif 2 <= int(timeout_numbers) <= 4:
-                    text = ' секунды'
-                else:
-                    text = ' секунд'
-                timeout_text = timeout_numbers + text
-            elif timeout_units == 'm':
-                final_timeout = int(timeout_numbers) * 60
-                if int(timeout_numbers[-1:]) == 1:
-                    text = ' минуту'
-                elif 2 <= int(timeout_numbers) <= 4:
-                    text = ' минуты'
-                else:
-                    text = ' минут'
-                timeout_text = timeout_numbers + text
-            elif timeout_units == 'h':
-                final_timeout = int(timeout_numbers) * 3600
-                if int(timeout_numbers) == 1:
-                    text = ' час'
-                elif 2 <= int(timeout_numbers) <= 4:
-                    text = ' часа'
-                else:
-                    text = ' часов'
-                timeout_text = timeout_numbers + text
-            elif timeout_units == 'd':
-                final_timeout = int(timeout_numbers) * 86400
-                if int(timeout_numbers) == 1:
-                    text = ' день'
-                elif 2 <= int(timeout_numbers[-1:]) <= 4:
-                    text = ' дня'
-                else:
-                    text = ' дней'
-                timeout_text = timeout_numbers + text
+            if str(type(tw.get_translation(message)['global']['time']['seconds'])) == "<class 'list'>":
+                if timeout_units == 's':
+                    final_timeout = int(timeout_numbers)
+                    if int(timeout_numbers[-1:]) == 1:
+                        text = trans['global']['time']['seconds'][0]
+                    elif 2 <= int(timeout_numbers) <= 4:
+                        text = trans['global']['time']['seconds'][1]
+                    else:
+                        text = trans['global']['time']['seconds'][2]
+                    timeout_text = timeout_numbers + ' ' + text
+                elif timeout_units == 'm':
+                    final_timeout = int(timeout_numbers) * 60
+                    if int(timeout_numbers[-1:]) == 1:
+                        text = trans['global']['time']['minutes'][0]
+                    elif 2 <= int(timeout_numbers) <= 4:
+                        text = trans['global']['time']['minutes'][1]
+                    else:
+                        text = trans['global']['time']['minutes'][2]
+                    timeout_text = timeout_numbers + ' ' + text
+                elif timeout_units == 'h':
+                    final_timeout = int(timeout_numbers) * 3600
+                    if int(timeout_numbers) == 1:
+                        text = trans['global']['time']['hours'][0]
+                    elif 2 <= int(timeout_numbers) <= 4:
+                        text = trans['global']['time']['hours'][1]
+                    else:
+                        text = trans['global']['time']['hours'][2]
+                    timeout_text = timeout_numbers + ' ' + text
+                elif timeout_units == 'd':
+                    final_timeout = int(timeout_numbers) * 86400
+                    if int(timeout_numbers) == 1:
+                        text = trans['global']['time']['days'][0]
+                    elif 2 <= int(timeout_numbers[-1:]) <= 4:
+                        text = trans['global']['time']['days'][1]
+                    else:
+                        text = trans['global']['time']['days'][2]
+                    timeout_text = timeout_numbers + ' ' + text
+
+            else:
+                if timeout_units == 's':
+                    final_timeout = int(timeout_numbers)
+                    text = trans['global']['time']['seconds']
+                    timeout_text = timeout_numbers + ' ' + text
+                elif timeout_units == 'm':
+                    final_timeout = int(timeout_numbers) * 60
+                    text = trans['global']['time']['minutes']
+                    timeout_text = timeout_numbers + ' ' + text
+                elif timeout_units == 'h':
+                    final_timeout = int(timeout_numbers) * 3600
+                    text = trans['global']['time']['hours']
+                    timeout_text = timeout_numbers + ' ' + text
+                elif timeout_units == 'd':
+                    final_timeout = int(timeout_numbers) * 86400
+                    text = trans['global']['time']['days']
+                    timeout_text = timeout_numbers + ' ' + text
 
             bot.restrict_chat_member(chat_id=message.chat.id,
                                      user_id=message.reply_to_message.from_user.id,
@@ -82,18 +102,19 @@ def tmute(message):
                                      until_date=int(time.time()) + final_timeout)
 
             bot.send_message(chat_id=message.chat.id,
-                             text='Мут был дан пользователю @' + str(
-                                 message.reply_to_message.from_user.username) + ' на ' + timeout_text)
+                             text=trans['mute']['tmute'].format(username=str(message.reply_to_message.from_user.username),
+                                                                time=timeout_text))
 
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 # Размут
 def unmute(message):
+    trans = tw.get_translation(message)
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -108,11 +129,11 @@ def unmute(message):
                                      can_send_other_messages=perms.can_send_other_messages,
                                      can_add_web_page_previews=perms.can_add_web_page_previews,
                                      until_date=0)
+
             bot.send_message(chat_id=message.chat.id,
-                             text='Мут был снят с пользователя @' + str(
-                                 message.reply_to_message.from_user.username))
+                             text=trans['mute']['unmute'].format(username=str(message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
