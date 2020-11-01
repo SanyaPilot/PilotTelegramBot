@@ -1,6 +1,6 @@
 import telebot
 import config
-import universal
+import translation
 import googletrans
 from googletrans import Translator
 
@@ -23,4 +23,4 @@ def tr(message):
                          parse_mode='HTML',
                          text=text)
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)

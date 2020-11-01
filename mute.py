@@ -1,6 +1,6 @@
 import telebot
 import config
-import universal
+import translation
 import time
 bot = telebot.TeleBot(config.token)
 
@@ -21,10 +21,10 @@ def mute(message):
                                   str(message.reply_to_message.from_user.username) + ' навсегда')
 
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 # Мут на время
@@ -86,10 +86,10 @@ def tmute(message):
                                  message.reply_to_message.from_user.username) + ' на ' + timeout_text)
 
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 # Размут
@@ -112,7 +112,7 @@ def unmute(message):
                              text='Мут был снят с пользователя @' + str(
                                  message.reply_to_message.from_user.username))
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)

@@ -1,6 +1,6 @@
 import telebot
 import config
-import universal
+import translation
 from telebot import types
 import requests
 import json
@@ -67,7 +67,7 @@ def weather(message):
                                   reply_markup=keyboard)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def forecast(message):
@@ -136,7 +136,7 @@ def forecast(message):
                                   reply_markup=keyboard)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def call_handler(call):

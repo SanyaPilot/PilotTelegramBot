@@ -1,6 +1,6 @@
 import telebot
 import config
-import universal
+import translation
 bot = telebot.TeleBot(config.token)
 
 
@@ -17,10 +17,10 @@ def restrict(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был лишен прав')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def permit(message):
@@ -44,10 +44,10 @@ def permit(message):
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
                                   ' были выданы полные пользовательские права (не путать с админкой)')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def permit_default(message):
@@ -73,10 +73,10 @@ def permit_default(message):
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
                                   ' были выданы дефолтные права')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 # Убрать все права
@@ -98,10 +98,10 @@ def demote(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был лишен всех админских прав')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 # Дать все права
@@ -123,7 +123,7 @@ def promote(message):
                              text='Пользователю @' + str(message.reply_to_message.from_user.username) +
                                   ' были выданы полные админские права')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)

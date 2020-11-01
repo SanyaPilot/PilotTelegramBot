@@ -1,6 +1,6 @@
 import telebot
 import config
-import universal
+import translation
 bot = telebot.TeleBot(config.token)
 
 
@@ -19,10 +19,10 @@ def kick(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был кикнут\nОн сможет вернуться в чат в будущем')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def kickme(message):
@@ -38,4 +38,4 @@ def kickme(message):
                               ' был кикнут\nОн сможет вернуться в чат в будущем')
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)

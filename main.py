@@ -11,7 +11,7 @@ import mute as Mute
 import translate
 import introduction
 import weather as Weather
-import universal
+import translation
 
 bot = telebot.TeleBot(config.token)
 
@@ -203,7 +203,7 @@ def button_callback_handler(call):
             introduction.call_handler(call)
 
     except Exception:
-        universal.error_call(call)
+        translation.error_call(call)
 
 
 bot.polling()

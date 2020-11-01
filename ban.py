@@ -1,7 +1,7 @@
 import telebot
 import time
 import config
-import universal
+import translation
 bot = telebot.TeleBot(config.token)
 
 
@@ -18,10 +18,10 @@ def ban(message):
             bot.send_message(chat_id=message.chat.id,
                              text=f'Пользователь @{username} был забанен\nОн больше НЕ сможет вернуться в чат в будущем')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def banme(message):
@@ -36,7 +36,7 @@ def banme(message):
                          text=msg.format(username=username))
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def tban(message):
@@ -96,10 +96,10 @@ def tban(message):
                                   ' был забанен на ' + timeout_text +
                                   '\nОн сможет вернуться в чат после истечения времени')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
 
 
 def unban(message):
@@ -114,7 +114,7 @@ def unban(message):
                              text='Пользователь @' + str(message.reply_to_message.from_user.username) +
                                   ' был разбанен\nТеперь он может вернуться в чат')
         else:
-            universal.admin_error_msg(message)
+            translation.admin_error_msg(message)
 
     except Exception:
-        universal.error_msg(message)
+        translation.error_msg(message)
