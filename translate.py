@@ -16,7 +16,10 @@ def tr(message):
         result = translator.translate(message.reply_to_message.text, dest=lang_code)
 
         langs = googletrans.LANGUAGES
-        text = trans['translate']['tr'].format(src_lang=langs[result.src], dest_lang=langs[lang_code]) + '\n'
+        text = '<i>'
+        if trans['translate']['tr'] != '':
+            text += trans['translate']['tr'].format(src_lang=langs[result.src], dest_lang=langs[lang_code]) + '\n'
+
         text += 'Translate from <b>' + langs[result.src] + '</b> to <b>' + langs[lang_code] + '</b></i>\n\n' + \
                 result.text
         bot.send_message(chat_id=message.chat.id,

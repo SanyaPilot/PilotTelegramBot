@@ -1,0 +1,86 @@
+{
+  "label": "English \ud83c\uddec\ud83c\udde7",
+  "lang_set": "Okay! Language is set to english!",
+  "global": {
+    "time": {
+      "seconds": "seconds",
+      "minutes": "minutes",
+      "hours": "hours",
+      "days": "days"
+    },
+    "errors": {
+      "default": "Oops... Something went wrong",
+      "admin": "You need administrative privileges to do this",
+      "setup": "Setup is not complete!"
+    }
+  },
+  "ban": {
+    "ban": "User @{username} was banned\nHe/she won't be able to return to the chat",
+    "tban": "User @{username} was banned for {time}\nHe/she will be able to return to the chat after time expiration",
+    "unban": "User @{username} was unbanned\nNow he/she can return to the chat"
+  },
+  "kick": {
+    "kick": "User @{username} was kicked\nHe/she will be able to return to the chat"
+  },
+  "mute": {
+    "mute": "User @{username} was muted",
+    "tmute": "User @{username} was muted for {time}",
+    "unmute": "User @{username} can write now"
+  },
+  "perms": {
+    "restrict": "User @{username} was restricted of all user permissions",
+    "permit": "User @{username} was granted full user permissions",
+    "permit_default": "User @{username} was granted default user permissions",
+    "demote": "User @{username} was demoted",
+    "promote": "User @{username} was promoted (become admin now)"
+  },
+  "greeting": {
+    "greeting": "I want to chat!",
+    "kick_bot": "User @{username} failed bot check.\nIt was kicked",
+    "set_greeting": "Greeting is set successfully!",
+    "rm_greeting": "Greeting is removed successfully!",
+    "check_success": "You successfully passed bot check!",
+    "other_user_err": "You can't pass other user's bot check"
+  },
+  "introduction": {
+    "start": "Hello! I'm administrative bot for a chat!\nFrom this moment I will help in this chat.\nFor correct work you should give me administrative privileges.\nPlease choose language. This will affect all bot's messages.",
+    "help": "Command list:\n/tr - Translate message. /tr <language code>\n/notes - Show notes list\n/note - Show note\n/addnote - Add note. /addnote <note name>\n/delnote - Delete note. /delnote <note name>\n/mute - Mute user forever\n/tmute - Mute user for time. /tmute <quantity><s/m/h/d>\n/unmute - Unmute user\n/ban - Ban user forever\n/banme - Ban user who wrote this command\n/tban - Ban user for time. /tban <quantity><s/m/h/d>\n/unban - Unban user\n/kick - Kick user\n/kickme - Kick user who wrote this command\n/restrict - Restrict user of all user permissions\n/permit - Grant user full user permissions\n/dpermit - Grant user default user permissions\n/demote - Demote user\n/promote - Promote user\n/weather - Show current weather. /weather <location>\n/forecast - Show weather forecast for a week /forecast <location>\n/setgreeting - Set greeting for new chat members\n/rmgreeting - Remove greeting for new chat members ATTENTION! If chat doesn't have a greeting, then bot check will be disabled!\nTo use some of these commands that can apply to user, you should reply command to user message"
+  },
+  "note": {
+    "notes": {
+      "list": "Notes list:",
+      "instruction": "You can retrieve these notes by using /note <note name> or #<note name>"
+    },
+    "addnote": "Note was added",
+    "delnote": "Note was removed"
+  },
+  "translate": {
+    "tr": ""
+  },
+  "weather": {
+    "city_not_found_err": "Such city is not found",
+    "making_forecast": "Making forecast for you...",
+    "weather_in": "<b><i>Weather in {city}</i></b>",
+    "humidity": "<i>Humidity:</i> <b>{humidity}%</b>",
+    "pressure": "<i>Pressure:</i> <b>{pressure} hPa</b>",
+    "wind_speed": "<i>Wind speed:</i> <b>{wind_speed} m/s</b>",
+    "cloudiness": "<i>Cloudiness:</i> <b>{cloudiness}%</b>",
+    "uvi": "<i>UV Index:</i> <b>{uvi}</b>",
+    "close_button": "I read",
+    "weather": {
+      "current_weather": "<b>Current weather</b>",
+      "feels_like": "<i>Feels like:</i> <b>{feels_like} °C</b>"
+    },
+    "forecast": {
+      "forecast_for": "<b>Forecast for {time}</b>",
+      "min_temp": "<i>Min. temperature:</i> <b>{min_temp} °C</b>",
+      "max_temp": "<i>Max. temperature:</i> <b>{max_temp} °C</b>",
+      "morn_temp": "<i>Morning temperature:</i> <b>{morn_temp} °C</b>",
+      "eve_temp": "<i>Eve temperature:</i> <b>{eve_temp} °C</b>",
+      "night_temp": "<i>Night temperature:</i> <b>{night_temp} °C</b>",
+      "start_of_list": "It's start of the list",
+      "end_of_list": "It's end of the list",
+      "other_user_err": "You can't control other user's forecast menu"
+    }
+  }
+}

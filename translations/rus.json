@@ -55,7 +55,7 @@
     "delnote": "Заметка была удалена"
   },
   "translate": {
-    "tr": "<i>Перевод с <b>{src_lang}</b> на <b>{dest_lang}</b>"
+    "tr": "Перевод с <b>{src_lang}</b> на <b>{dest_lang}</b>"
   },
   "weather": {
     "city_not_found_err": "Такой город не найден",

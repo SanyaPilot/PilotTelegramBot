@@ -10,7 +10,11 @@ bot = telebot.TeleBot(config.token)
 class TranslationWorker:
     def __init__(self):
         self.available = os.listdir('translations')
-        print('Available translations: ' + self.available[0].split('.')[0])
+        text = 'Available translations:'
+        for i in self.available:
+            text += ' ' + i.split('.')[0]
+        
+        print(text)
         self.translations = {}
         if self.available:
             for i in self.available:
