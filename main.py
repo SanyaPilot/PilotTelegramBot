@@ -11,6 +11,7 @@ import mute as Mute
 import translate
 import introduction
 import weather as Weather
+import messages as Messages
 import translation
 
 bot = telebot.TeleBot(config.token)
@@ -166,6 +167,11 @@ def weather_wrapper(message):
 @bot.message_handler(commands=['forecast'])
 def forecast_wrapper(message):
     Weather.forecast(message)
+
+
+@bot.message_handler(commands=['purge'])
+def purge_wrapper(message):
+    Messages.purge(message)
 
 
 @bot.message_handler(content_types=['text'])
