@@ -12,9 +12,9 @@ def ban(message):
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            #bot.kick_chat_member(chat_id=message.chat.id,
-            #                     user_id=message.reply_to_message.from_user.id,
-            #                     until_date=0)
+            bot.kick_chat_member(chat_id=message.chat.id,
+                                 user_id=message.reply_to_message.from_user.id,
+                                 until_date=0)
 
             bot.send_message(chat_id=message.chat.id,
                              text=trans['ban']['ban'].format(username=str(message.reply_to_message.from_user.username)))
