@@ -2,16 +2,7 @@ import telebot
 import sqlite3
 
 import config
-import greeting as Greeting
-import kick as Kick
-import ban as Ban
-import note as Note
-import perms as Perms
-import mute as Mute
-import translate
-import introduction
-import weather as Weather
-import messages as Messages
+from modules import introduction, translate, ban, greeting, kick, messages, mute, note, perms, weather
 from translation import tw
 
 bot = telebot.TeleBot(config.token)
@@ -52,96 +43,96 @@ def help_wrapper(message):
 # Мут навсегда
 @bot.message_handler(commands=['mute'])
 def mute_wrapper(message):
-    Mute.mute(message)
+    mute.mute(message)
 
 
 # Мут на время
 @bot.message_handler(commands=['tmute'])
 def tmute_wrapper(message):
-    Mute.tmute(message)
+    mute.tmute(message)
 
 
 # Размут
 @bot.message_handler(commands=['unmute'])
 def unmute_wrapper(message):
-    Mute.unmute(message)
+    mute.unmute(message)
 
 
 @bot.message_handler(commands=['restrict'])
 def restrict_wrapper(message):
-    Perms.restrict(message)
+    perms.restrict(message)
 
 
 @bot.message_handler(commands=['permit'])
 def permit_wrapper(message):
-    Perms.permit(message)
+    perms.permit(message)
 
 
 @bot.message_handler(commands=['dpermit'])
 def permit_default_wrapper(message):
-    Perms.permit_default(message)
+    perms.permit_default(message)
 
 
 # Убрать все права
 @bot.message_handler(commands=['demote'])
 def demote_wrapper(message):
-    Perms.demote(message)
+    perms.demote(message)
 
 
 # Дать все права
 @bot.message_handler(commands=['promote'])
 def promote_wrapper(message):
-    Perms.promote(message)
+    perms.promote(message)
 
 
 @bot.message_handler(commands=['kick'])
 def kick_wrapper(message):
-    Kick.kick(message)
+    kick.kick(message)
 
 
 @bot.message_handler(commands=['kickme'])
 def kickme_wrapper(message):
-    Kick.kickme(message)
+    kick.kickme(message)
 
 
 @bot.message_handler(commands=['ban'])
 def ban_wrapper(message):
-    Ban.ban(message)
+    ban.ban(message)
 
 
 @bot.message_handler(commands=['banme'])
 def banme_wrapper(message):
-    Ban.banme(message)
+    ban.banme(message)
 
 
 @bot.message_handler(commands=['tban'])
 def tban_wrapper(message):
-    Ban.tban(message)
+    ban.tban(message)
 
 
 @bot.message_handler(commands=['unban'])
 def unban_wrapper(message):
-    Ban.unban(message)
+    ban.unban(message)
 
 
 @bot.message_handler(commands=['notes'])
 def notes_wrapper(message):
-    Note.notes(message)
+    note.notes(message)
 
 
 @bot.message_handler(commands=['note'])
 def note_wrapper(message):
-    Note.note(message)
+    note.note(message)
 
 
 @bot.message_handler(commands=['addnote'])
 def addnote_wrapper(message):
-    Note.addnote(message)
+    note.addnote(message)
 
 
 @bot.message_handler(commands=['delnote'])
 def delnote_wrapper(message):
-    Note.delnote(message)
+    note.delnote(message)
 
 
 @bot.message_handler(commands=['tr'])
@@ -151,44 +142,44 @@ def tr_wrapper(message):
 
 @bot.message_handler(commands=['weather'])
 def weather_wrapper(message):
-    Weather.weather(message)
+    weather.weather(message)
 
 
 @bot.message_handler(commands=['forecast'])
 def forecast_wrapper(message):
-    Weather.forecast(message)
+    weather.forecast(message)
 
 
 @bot.message_handler(commands=['purge'])
 def purge_wrapper(message):
-    Messages.purge(message)
+    messages.purge(message)
 
 
 @bot.message_handler(commands=['setgreeting'])
 def set_greeting(message):
-    Greeting.set_greeting(message)
+    greeting.set_greeting(message)
 
 
 @bot.message_handler(commands=['rmgreeting'])
 def rm_greeting(message):
-    Greeting.rm_greeting(message)
+    greeting.rm_greeting(message)
 
 
 @bot.message_handler(commands=['setleavemsg'])
 def rm_user_leave_msg(message):
-    Greeting.set_user_leave_msg(message)
+    greeting.set_user_leave_msg(message)
 
 
 @bot.message_handler(commands=['rmleavemsg'])
 def rm_greeting(message):
-    Greeting.rm_user_leave_msg(message)
+    greeting.rm_user_leave_msg(message)
 
 
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
     try:
         if message.text[0] == '#':
-            Note.text_handler(message)
+            note.text_handler(message)
 
     except Exception:
         pass
@@ -197,13 +188,13 @@ def text_handler(message):
 # Триггер на нового юзера в чате
 @bot.message_handler(content_types=['new_chat_members'])
 def greeting_wrapper(message):
-    Greeting.greeting(message)
+    greeting.greeting(message)
 
 
 # Триггер на уход юзера из чата
 @bot.message_handler(content_types=['left_chat_member'])
 def user_leave_msg_wrapper(message):
-    Greeting.user_leave_msg(message)
+    greeting.user_leave_msg(message)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -211,10 +202,10 @@ def button_callback_handler(call):
     trans = tw.get_translation(call)
     try:
         if call.data == 'captcha_ok':
-            Greeting.call_handler(call)
+            greeting.call_handler(call)
 
         if 'forecast' in call.data or 'weather' in call.data:
-            Weather.call_handler(call)
+            weather.call_handler(call)
 
         if 'lang' in call.data:
             introduction.call_handler(call)
