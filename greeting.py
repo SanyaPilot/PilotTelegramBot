@@ -128,12 +128,85 @@ def rm_greeting(message):
         bot.reply_to(message, trans['global']['errors']['default'])
 
 
-#def set_user_left_msg(message):
-#    trans = tw.get_translation(message)
-#    try:
-#        member = bot.get_chat_member(chat_id=message.chat.id,
-#                                     user_id=message.from_user.id)
-#        if member.status == 'creator' or member.status == 'administrator':
+def set_user_leave_msg(message):
+    trans = tw.get_translation(message)
+    if trans == 1:
+        return
+    try:
+        member = bot.get_chat_member(chat_id=message.chat.id,
+                                     user_id=message.from_user.id)
+        if member.status == 'creator' or member.status == 'administrator':
+            try:
+                conn = sqlite3.connect('data.db')
+                curs = conn.cursor()
+                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
+                result = curs.fetchall()
+                if result[0][0] == 1:
+                    curs.execute("""UPDATE chats
+                                    SET leave_msg = ?
+                                    WHERE chat_id = ?""", (message.reply_to_message.text, message.chat.id))
+                    conn.commit()
+                    bot.reply_to(message, trans['greeting']['set_user_leave_msg'])
+
+                conn.close()
+            except Exception:
+                bot.reply_to(message, trans['global']['errors']['setup'])
+        else:
+            bot.reply_to(message, trans['global']['errors']['admin'])
+    except Exception:
+        bot.reply_to(message, trans['global']['errors']['default'])
+
+
+def rm_user_leave_msg(message):
+    trans = tw.get_translation(message)
+    if trans == 1:
+        return
+    try:
+        member = bot.get_chat_member(chat_id=message.chat.id,
+                                     user_id=message.from_user.id)
+        if member.status == 'creator' or member.status == 'administrator':
+            try:
+                conn = sqlite3.connect('data.db')
+                curs = conn.cursor()
+                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
+                result = curs.fetchall()
+                if result[0][0] == 1:
+                    curs.execute("""UPDATE chats
+                                    SET leave_msg = ?
+                                    WHERE chat_id = ?""", ('', message.chat.id))
+                    conn.commit()
+                    bot.reply_to(message, trans['greeting']['rm_user_leave_msg'])
+
+                conn.close()
+            except Exception:
+                bot.reply_to(message, trans['global']['errors']['setup'])
+        else:
+            bot.reply_to(message, trans['global']['errors']['admin'])
+    except Exception:
+        bot.reply_to(message, trans['global']['errors']['default'])
+
+
+def user_leave_msg(message):
+    trans = tw.get_translation(message)
+    if trans == 1:
+        return
+    try:
+        conn = sqlite3.connect('data.db')
+        curs = conn.cursor()
+        curs.execute('SELECT * FROM chats WHERE chat_id = ?', (message.chat.id,))
+        result = curs.fetchall()
+        conn.close()
+        try:
+            row = result[0]
+            if row[2] == 1 and row[4]:
+                bot.send_message(chat_id=message.chat.id,
+                                 reply_to_message_id=message.message_id,
+                                 parse_mode='HTML',
+                                 text=row[4])
+        except IndexError:
+            pass
+    except Exception:
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def call_handler(call):

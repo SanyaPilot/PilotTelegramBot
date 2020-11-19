@@ -37,8 +37,10 @@
   "greeting": {
     "greeting": "I want to chat!",
     "kick_bot": "User @{username} failed bot check.\nIt was kicked",
-    "set_greeting": "Greeting is set successfully!",
-    "rm_greeting": "Greeting is removed successfully!",
+    "set_greeting": "Greeting set successfully!",
+    "rm_greeting": "Greeting removed successfully!",
+    "set_user_leave_msg": "User leave message set successfully!",
+    "rm_user_leave_msg": "User leave message removed successfully!",
     "check_success": "You successfully passed bot check!",
     "other_user_err": "You can't pass other user's bot check"
   },
@@ -51,8 +53,8 @@
       "list": "Notes list:",
       "instruction": "You can retrieve these notes by using /note <note name> or #<note name>"
     },
-    "addnote": "Note was added",
-    "delnote": "Note was removed"
+    "addnote": "Note added",
+    "delnote": "Note removed"
   },
   "translate": {
     "tr": ""
@@ -84,6 +86,6 @@
     }
   },
   "messages": {
-    "purge": "Purge was completed"
+    "purge": "Purge completed"
   }
 }

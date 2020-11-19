@@ -32,6 +32,7 @@ table = """ CREATE TABLE IF NOT EXISTS chats (
                 chat_id integer NOT NULL,
                 setup_is_finished integer NOT NULL,
                 greeting text,
+                leave_msg text,
                 language text
             ); """
 curs.execute(table)
@@ -47,17 +48,6 @@ def start_wrapper(message):
 @bot.message_handler(commands=['help'])
 def help_wrapper(message):
     introduction.help(message)
-
-
-@bot.message_handler(commands=['setgreeting'])
-def set_greeting(message):
-    Greeting.set_greeting(message)
-
-
-@bot.message_handler(commands=['rmgreeting'])
-def rm_greeting(message):
-    Greeting.rm_greeting(message)
-
 
 # Мут навсегда
 @bot.message_handler(commands=['mute'])
@@ -174,6 +164,26 @@ def purge_wrapper(message):
     Messages.purge(message)
 
 
+@bot.message_handler(commands=['setgreeting'])
+def set_greeting(message):
+    Greeting.set_greeting(message)
+
+
+@bot.message_handler(commands=['rmgreeting'])
+def rm_greeting(message):
+    Greeting.rm_greeting(message)
+
+
+@bot.message_handler(commands=['setleavemsg'])
+def rm_user_leave_msg(message):
+    Greeting.set_user_leave_msg(message)
+
+
+@bot.message_handler(commands=['rmleavemsg'])
+def rm_greeting(message):
+    Greeting.rm_user_leave_msg(message)
+
+
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
     try:
@@ -192,8 +202,8 @@ def greeting_wrapper(message):
 
 # Триггер на уход юзера из чата
 @bot.message_handler(content_types=['left_chat_member'])
-def greeting(message):
-    bot.reply_to(message, text='Ну ладно, пока( *хнык*')
+def user_leave_msg_wrapper(message):
+    Greeting.user_leave_msg(message)
 
 
 @bot.callback_query_handler(func=lambda call: True)
