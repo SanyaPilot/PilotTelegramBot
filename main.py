@@ -12,7 +12,7 @@ import translate
 import introduction
 import weather as Weather
 import messages as Messages
-import translation
+from translation import tw
 
 bot = telebot.TeleBot(config.token)
 
@@ -198,6 +198,7 @@ def greeting(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def button_callback_handler(call):
+    trans = tw.get_translation(call)
     try:
         if call.data == 'captcha_ok':
             Greeting.call_handler(call)
@@ -209,7 +210,7 @@ def button_callback_handler(call):
             introduction.call_handler(call)
 
     except Exception:
-        translation.error_call(call)
+        bot.answer_callback_query(callback_query_id=call.id, text=trans['global']['errors']['default'])
 
 
 bot.polling()

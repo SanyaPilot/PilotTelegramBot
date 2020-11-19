@@ -11,6 +11,8 @@ timers = {}
 
 def greeting(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
@@ -47,6 +49,8 @@ def greeting(message):
 
 def kick_bot(chat_id, user_id, message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         bot.kick_chat_member(chat_id=chat_id,
                              user_id=user_id,
@@ -68,6 +72,8 @@ def kick_bot(chat_id, user_id, message):
 
 def set_greeting(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -95,6 +101,8 @@ def set_greeting(message):
 
 def rm_greeting(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -120,8 +128,18 @@ def rm_greeting(message):
         bot.reply_to(message, trans['global']['errors']['default'])
 
 
+#def set_user_left_msg(message):
+#    trans = tw.get_translation(message)
+#    try:
+#        member = bot.get_chat_member(chat_id=message.chat.id,
+#                                     user_id=message.from_user.id)
+#        if member.status == 'creator' or member.status == 'administrator':
+
+
 def call_handler(call):
     trans = tw.get_translation(call)
+    if trans == 1:
+        return
     try:
         timers[call.from_user.id].cancel()
 

@@ -16,6 +16,8 @@ def del_msgs(msgs, chat_id):
 
 def purge(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)

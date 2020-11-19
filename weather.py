@@ -16,6 +16,8 @@ weathers = {}
 
 def weather(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         words = message.text.split()
         city_name = words[1]
@@ -74,6 +76,8 @@ def weather(message):
 
 def forecast(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         words = message.text.split()
         city_name = words[1]
@@ -150,6 +154,8 @@ def forecast(message):
 
 def call_handler(call):
     trans = tw.get_translation(call)
+    if trans == 1:
+        return
     if call.data == 'forecast_prev':
         if call.from_user.id == forecasts[call.message.message_id][9]:
             if not forecasts[call.message.message_id][8] <= 0:

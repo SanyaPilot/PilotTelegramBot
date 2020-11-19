@@ -10,6 +10,8 @@ translator = Translator()
 
 def tr(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         words = message.text.split()
         lang_code = words[1]

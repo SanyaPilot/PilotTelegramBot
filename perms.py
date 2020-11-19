@@ -6,6 +6,8 @@ bot = telebot.TeleBot(config.token)
 
 def restrict(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -25,6 +27,8 @@ def restrict(message):
 
 def permit(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -52,6 +56,8 @@ def permit(message):
 
 def permit_default(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -83,6 +89,8 @@ def permit_default(message):
 # Убрать все права
 def demote(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -109,6 +117,8 @@ def demote(message):
 # Дать все права
 def promote(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)

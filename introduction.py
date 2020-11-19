@@ -32,7 +32,6 @@ def start(message):
                                 WHERE chat_id = ?""", (tw.available[0].split('.')[0], 1, message.chat.id))
     conn.commit()
     conn.close()
-    print(message)
     trans = tw.get_translation(message)
     bot.send_message(message.chat.id, trans['introduction']['start'],
                      reply_markup=keyboard)
@@ -40,6 +39,8 @@ def start(message):
 
 def help(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
 
     conn = sqlite3.connect('data.db')
     curs = conn.cursor()

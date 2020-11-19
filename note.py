@@ -8,6 +8,8 @@ bot = telebot.TeleBot(config.token)
 
 def notes(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         cmd = """ SELECT name FROM notes
                   WHERE chat_id = ?"""
@@ -33,6 +35,8 @@ def notes(message):
 
 def note(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         words = message.text.split()
         name = words[1]
@@ -56,6 +60,8 @@ def note(message):
 
 def addnote(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -81,6 +87,8 @@ def addnote(message):
 
 def delnote(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)

@@ -8,6 +8,8 @@ bot = telebot.TeleBot(config.token)
 
 def ban(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -27,6 +29,8 @@ def ban(message):
 
 def banme(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         bot.kick_chat_member(chat_id=message.chat.id,
                              user_id=message.from_user.id,
@@ -41,6 +45,8 @@ def banme(message):
 
 def tban(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -123,6 +129,8 @@ def tban(message):
 
 def unban(message):
     trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)

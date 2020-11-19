@@ -1,10 +1,13 @@
 import telebot
 import config
-import translation
+from translation import tw
 bot = telebot.TeleBot(config.token)
 
 
 def kick(message):
+    trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         member = bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
@@ -16,16 +19,18 @@ def kick(message):
                                   user_id=message.reply_to_message.from_user.id)
 
             bot.send_message(chat_id=message.chat.id,
-                             text='Пользователь @' + str(message.reply_to_message.from_user.username) +
-                                  ' был кикнут\nОн сможет вернуться в чат в будущем')
+                             text=trans['kick']['kick'].format(username=str(message.reply_to_message.from_user.username)))
         else:
-            translation.admin_error_msg(message)
+            bot.reply_to(message, trans['global']['errors']['admin'])
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
 
 
 def kickme(message):
+    trans = tw.get_translation(message)
+    if trans == 1:
+        return
     try:
         bot.kick_chat_member(chat_id=message.chat.id,
                              user_id=message.from_user.id,
@@ -34,8 +39,7 @@ def kickme(message):
                               user_id=message.from_user.id)
 
         bot.send_message(chat_id=message.chat.id,
-                         text='Пользователь @' + str(message.from_user.username) +
-                              ' был кикнут\nОн сможет вернуться в чат в будущем')
+                         text=trans['kick']['kick'].format(username=str(message.reply_to_message.from_user.username)))
 
     except Exception:
-        translation.error_msg(message)
+        bot.reply_to(message, trans['global']['errors']['default'])
