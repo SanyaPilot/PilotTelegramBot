@@ -87,5 +87,12 @@
   },
   "messages": {
     "purge": "Purge completed"
+  },
+  "admin": {
+    "broadcast": {
+      "start": "Starting broadcast...",
+      "process": "Sent messages: {count}",
+      "end": "Broadcast finished.\nMessages sent: {count}"
+    }
   }
 }

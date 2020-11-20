@@ -2,7 +2,7 @@ import telebot
 import sqlite3
 
 import config
-from modules import introduction, translate, ban, greeting, kick, messages, mute, note, perms, weather
+from modules import introduction, translate, ban, greeting, kick, messages, mute, note, perms, weather, admin
 from translation import tw
 
 bot = telebot.TeleBot(config.token)
@@ -173,6 +173,11 @@ def rm_user_leave_msg(message):
 @bot.message_handler(commands=['rmleavemsg'])
 def rm_greeting(message):
     greeting.rm_user_leave_msg(message)
+
+
+@bot.message_handler(commands=['broadcast'])
+def broadcast_wrapper(message):
+    admin.broadcast(message)
 
 
 @bot.message_handler(content_types=['text'])
