@@ -40,16 +40,11 @@ def start_wrapper(message):
 def help_wrapper(message):
     introduction.help(message)
 
+
 # Мут навсегда
 @bot.message_handler(commands=['mute'])
 def mute_wrapper(message):
     mute.mute(message)
-
-
-# Мут на время
-@bot.message_handler(commands=['tmute'])
-def tmute_wrapper(message):
-    mute.tmute(message)
 
 
 # Размут

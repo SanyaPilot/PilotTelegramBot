@@ -25,6 +25,7 @@
   "mute": {
     "mute": "User @{username} was muted",
     "tmute": "User @{username} was muted for {time}",
+    "tmute_too_few": "You can't mute user for less than 30 seconds",
     "unmute": "User @{username} can write now"
   },
   "perms": {
