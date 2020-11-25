@@ -10,6 +10,16 @@ bot = telebot.TeleBot(config.token)
 def start(message):
     conn = sqlite3.connect('data.db')
     curs = conn.cursor()
+    curs.execute('SELECT chat_id FROM chats')
+    chats = curs.fetchall()
+    print(chats)
+    print(message.chat.id)
+    try:
+        if message.chat.id in chats[0]:
+            return
+    except IndexError:
+        pass
+
     curs.execute('INSERT INTO chats(chat_id, setup_is_finished) VALUES(?,?)', (message.chat.id, 0))
     conn.commit()
 
