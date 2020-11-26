@@ -1,10 +1,6 @@
-import telebot
-import config
 import sqlite3
 import json
 import os
-
-bot = telebot.TeleBot(config.token)
 
 
 class TranslationWorker:
@@ -49,6 +45,3 @@ class TranslationWorker:
         rows = curs.fetchall()
         conn.close()
         return rows[0][0]
-
-
-tw = TranslationWorker()

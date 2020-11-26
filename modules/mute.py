@@ -1,17 +1,17 @@
-import telebot
-import config
-from translation import tw
 import time
-bot = telebot.TeleBot(config.token)
+
+from aiogram.types import Message
+from init import dp, tw, bot
 
 
 # Мут навсегда
-def mute(message):
+@dp.message_handler(commands='mute')
+async def mute(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
+        member = await bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             if len(message.text.split()) > 1:
@@ -20,8 +20,8 @@ def mute(message):
                 timeout_units = timeout[-1:]
                 timeout_numbers = timeout[:-1]
                 if timeout_units == 's' and int(timeout_numbers) < 30:
-                    bot.send_message(chat_id=message.chat.id,
-                                     text=trans['mute']['tmute_too_few'])
+                    await bot.send_message(chat_id=message.chat.id,
+                                           text=trans['mute']['tmute_too_few'])
                     return
                 final_timeout = None
                 timeout_text = None
@@ -81,55 +81,58 @@ def mute(message):
                         text = trans['global']['time']['days']
                         timeout_text = timeout_numbers + ' ' + text
 
-                bot.restrict_chat_member(chat_id=message.chat.id,
-                                         user_id=message.reply_to_message.from_user.id,
-                                         can_send_messages=False,
-                                         until_date=int(time.time()) + final_timeout)
+                await bot.restrict_chat_member(chat_id=message.chat.id,
+                                               user_id=message.reply_to_message.from_user.id,
+                                               can_send_messages=False,
+                                               until_date=int(time.time()) + final_timeout)
 
-                bot.send_message(chat_id=message.chat.id,
-                                 text=trans['mute']['tmute'].format(
-                                 username=str(message.reply_to_message.from_user.username),
-                                 time=timeout_text))
+                await bot.send_message(chat_id=message.chat.id,
+                                       text=trans['mute']['tmute'].format(
+                                           username=str(message.reply_to_message.from_user.username),
+                                           time=timeout_text))
             else:
-                bot.restrict_chat_member(chat_id=message.chat.id,
-                                         user_id=message.reply_to_message.from_user.id,
-                                         can_send_messages=False,
-                                         until_date=0)
+                await bot.restrict_chat_member(chat_id=message.chat.id,
+                                               user_id=message.reply_to_message.from_user.id,
+                                               can_send_messages=False,
+                                               until_date=0)
 
-                bot.send_message(chat_id=message.chat.id,
-                                 text=trans['mute']['mute'].format(username=str(message.reply_to_message.from_user.username)))
+                await bot.send_message(chat_id=message.chat.id,
+                                       text=trans['mute']['mute'].format(
+                                           username=str(message.reply_to_message.from_user.username)))
 
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
 # Размут
-def unmute(message):
+@dp.message_handler(commands='unmute')
+async def unmute(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
+        member = await bot.get_chat_member(chat_id=message.chat.id,
+                                           user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            chat = bot.get_chat(chat_id=message.chat.id)
+            chat = await bot.get_chat(chat_id=message.chat.id)
             perms = chat.permissions
-            bot.restrict_chat_member(chat_id=message.chat.id,
-                                     user_id=message.reply_to_message.from_user.id,
-                                     can_send_messages=True,
-                                     can_send_media_messages=perms.can_send_media_messages,
-                                     can_send_polls=perms.can_send_polls,
-                                     can_send_other_messages=perms.can_send_other_messages,
-                                     can_add_web_page_previews=perms.can_add_web_page_previews,
-                                     until_date=0)
+            await bot.restrict_chat_member(chat_id=message.chat.id,
+                                           user_id=message.reply_to_message.from_user.id,
+                                           can_send_messages=True,
+                                           can_send_media_messages=perms.can_send_media_messages,
+                                           can_send_other_messages=perms.can_send_other_messages,
+                                           can_add_web_page_previews=perms.can_add_web_page_previews,
+                                           until_date=0)
 
-            bot.send_message(chat_id=message.chat.id,
-                             text=trans['mute']['unmute'].format(username=str(message.reply_to_message.from_user.username)))
+            await bot.send_message(chat_id=message.chat.id,
+                                   text=trans['mute']['unmute'].format(
+                                       username=str(message.reply_to_message.from_user.username)))
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
-    except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+    except Exception as e:
+        await message.reply(trans['global']['errors']['default'])
+        print(e)
