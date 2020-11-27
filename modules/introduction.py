@@ -1,21 +1,16 @@
-import telebot
-from telebot import types
-import config
-from translation import tw
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from init import bot, dp, tw
 import sqlite3
 
-bot = telebot.TeleBot(config.token)
 
-
-def start(message):
+@dp.message_handler(commands='start')
+async def start(message: Message):
     conn = sqlite3.connect('data.db')
     curs = conn.cursor()
     curs.execute('SELECT chat_id FROM chats')
     chats = curs.fetchall()
-    print(chats)
-    print(message.chat.id)
     try:
-        if message.chat.id in chats[0]:
+        if (message.chat.id,) in chats:
             return
     except IndexError:
         pass
@@ -23,10 +18,10 @@ def start(message):
     curs.execute('INSERT INTO chats(chat_id, setup_is_finished) VALUES(?,?)', (message.chat.id, 0))
     conn.commit()
 
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard = InlineKeyboardMarkup(row_width=2)
     for i in tw.available:
         name = i.split('.')[0]
-        keyboard.add(types.InlineKeyboardButton(text=tw.get_labels()[name], callback_data=f'lang_{name}'))
+        keyboard.add(InlineKeyboardButton(text=tw.get_labels()[name], callback_data=f'lang_{name}'))
 
     # key_close = types.InlineKeyboardButton(text='Next >>', callback_data='setup_next')
     # keyboard.add(key_close)
@@ -37,17 +32,18 @@ def start(message):
                         WHERE chat_id = ?""", ('eng', 1, message.chat.id))
     else:
         curs.execute("""UPDATE chats
-                                SET language = ?,
-                                    setup_is_finished = ?
-                                WHERE chat_id = ?""", (tw.available[0].split('.')[0], 1, message.chat.id))
+                        SET language = ?,
+                        setup_is_finished = ?
+                        WHERE chat_id = ?""", (tw.available[0].split('.')[0], 1, message.chat.id))
     conn.commit()
     conn.close()
     trans = tw.get_translation(message)
-    bot.send_message(message.chat.id, trans['introduction']['start'],
-                     reply_markup=keyboard)
+    await bot.send_message(message.chat.id, trans['introduction']['start'],
+                           reply_markup=keyboard)
 
 
-def help(message):
+@dp.message_handler(commands='help')
+async def help(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
@@ -64,18 +60,18 @@ def help(message):
     else:
         text = trans['introduction']['help']
 
-    bot.send_message(chat_id=message.chat.id,
-                     text=text)
+    await bot.send_message(chat_id=message.chat.id,
+                           text=text)
 
 
-def call_handler(call):
+@dp.callback_query_handler(lambda c: 'lang' in c.data)
+async def call_handler(call: CallbackQuery):
     trans = tw.get_translation(call)
     try:
         conn = sqlite3.connect('data.db')
         curs = conn.cursor()
-        member = bot.get_chat_member(chat_id=call.message.chat.id,
-                                     user_id=call.message.from_user.id)
-
+        member = await bot.get_chat_member(chat_id=call.message.chat.id,
+                                           user_id=call.message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             curs.execute("""UPDATE chats
                             SET language = ?,
@@ -84,22 +80,22 @@ def call_handler(call):
             conn.commit()
             conn.close()
             trans = tw.get_translation(call)
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text=trans['lang_set'])
+            await bot.answer_callback_query(callback_query_id=call.id,
+                                            text=trans['lang_set'])
 
-            keyboard = types.InlineKeyboardMarkup(row_width=2)
+            keyboard = InlineKeyboardMarkup(row_width=2)
             for i in tw.available:
                 name = i.split('.')[0]
                 keyboard.add(
-                    types.InlineKeyboardButton(text=tw.get_labels()[name], callback_data=f'lang_{name}'))
-            bot.edit_message_text(chat_id=call.message.chat.id,
-                                  message_id=call.message.message_id,
-                                  text=trans['introduction']['start'],
-                                  reply_markup=keyboard)
+                    InlineKeyboardButton(text=tw.get_labels()[name], callback_data=f'lang_{name}'))
+            await bot.edit_message_text(chat_id=call.message.chat.id,
+                                        message_id=call.message.message_id,
+                                        text=trans['introduction']['start'],
+                                        reply_markup=keyboard)
 
         else:
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text=trans['global']['errors']['admin'])
+            await bot.answer_callback_query(callback_query_id=call.id,
+                                            text=trans['global']['errors']['admin'])
     except Exception:
-        bot.answer_callback_query(callback_query_id=call.id,
-                                  text=trans['global']['errors']['default'])
+        await bot.answer_callback_query(callback_query_id=call.id,
+                                        text=trans['global']['errors']['default'])
