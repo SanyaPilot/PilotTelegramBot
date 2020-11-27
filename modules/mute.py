@@ -12,7 +12,7 @@ async def mute(message: Message):
         return
     try:
         member = await bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
+                                           user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             if len(message.text.split()) > 1:
                 words = message.text.split()

@@ -1,54 +1,54 @@
-import telebot
+from aiogram.types import Message
 import time
-import config
-from translation import tw
-
-bot = telebot.TeleBot(config.token)
+from init import bot, dp, tw
 
 
-def ban(message):
+@dp.message_handler(commands='ban')
+async def ban(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
+        member = await bot.get_chat_member(chat_id=message.chat.id,
+                                           user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            bot.kick_chat_member(chat_id=message.chat.id,
-                                 user_id=message.reply_to_message.from_user.id,
-                                 until_date=0)
+            await bot.kick_chat_member(chat_id=message.chat.id,
+                                       user_id=message.reply_to_message.from_user.id,
+                                       until_date=0)
 
-            bot.send_message(chat_id=message.chat.id,
-                             text=trans['ban']['ban'].format(username=str(message.reply_to_message.from_user.username)))
+            await bot.send_message(chat_id=message.chat.id,
+                                   text=trans['ban']['ban'].format(username=str(message.reply_to_message.from_user.username)))
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def banme(message):
+@dp.message_handler(commands='banme')
+async def banme(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        bot.kick_chat_member(chat_id=message.chat.id,
-                             user_id=message.from_user.id,
-                             until_date=0)
+        await bot.kick_chat_member(chat_id=message.chat.id,
+                                   user_id=message.from_user.id,
+                                   until_date=0)
 
-        bot.send_message(chat_id=message.chat.id,
-                         text=trans['ban']['ban'].format(username=str(message.from_user.username)))
+        await bot.send_message(chat_id=message.chat.id,
+                               text=trans['ban']['ban'].format(username=str(message.from_user.username)))
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def tban(message):
+@dp.message_handler(commands='tban')
+async def tban(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
+        member = await bot.get_chat_member(chat_id=message.chat.id,
                                      user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             words = message.text.split()
@@ -113,35 +113,36 @@ def tban(message):
                     text = trans['global']['time']['days']
                     timeout_text = timeout_numbers + ' ' + text
 
-            bot.kick_chat_member(chat_id=message.chat.id,
-                                 user_id=message.reply_to_message.from_user.id,
-                                 until_date=int(time.time()) + final_timeout)
+            await bot.kick_chat_member(chat_id=message.chat.id,
+                                       user_id=message.reply_to_message.from_user.id,
+                                       until_date=int(time.time()) + final_timeout)
 
-            bot.send_message(chat_id=message.chat.id,
-                             text=trans['ban']['tban'].format(username=str(message.reply_to_message.from_user.username),
-                                                              time=timeout_text))
+            await bot.send_message(chat_id=message.chat.id,
+                                   text=trans['ban']['tban'].format(username=str(message.reply_to_message.from_user.username),
+                                                                    time=timeout_text))
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def unban(message):
+@dp.message_handler(commands='unban')
+async def unban(message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
+        member = await bot.get_chat_member(chat_id=message.chat.id,
+                                           user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            bot.unban_chat_member(chat_id=message.chat.id,
-                                  user_id=message.reply_to_message.from_user.id)
+            await bot.unban_chat_member(chat_id=message.chat.id,
+                                        user_id=message.reply_to_message.from_user.id)
 
-            bot.send_message(chat_id=message.chat.id,
-                             text=trans['ban']['unban'].format(username=str(message.reply_to_message.from_user.username)))
+            await bot.send_message(chat_id=message.chat.id,
+                                   text=trans['ban']['unban'].format(username=str(message.reply_to_message.from_user.username)))
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
