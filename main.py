@@ -2,7 +2,7 @@ from aiogram import executor
 from init import dp
 
 #from modules import introduction, translate, ban, greeting, kick, messages, mute, note, perms, weather, admin
-from modules import introduction, mute, ban, perms, greeting, note, messages
+from modules import introduction, mute, ban, kick, perms, greeting, note, messages
 
 
 if __name__ == '__main__':
