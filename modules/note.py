@@ -1,12 +1,10 @@
-import telebot
-import config
-from translation import tw
+from aiogram.types import Message
+from init import bot, dp, tw
 import sqlite3
 
-bot = telebot.TeleBot(config.token)
 
-
-def notes(message):
+@dp.message_handler(commands='notes')
+async def notes(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
@@ -19,21 +17,22 @@ def notes(message):
         curs.execute(cmd, (message.chat.id,))
         rows = curs.fetchall()
         conn.close()
-        text = '┏━━━━━━━━━━━━━━━━━━━\n┣' + trans['note']['notes']['list'] + '\n┃\n'
+        text = '━━━━━━━━━━━━━━━━━━━━\n' + trans['note']['notes']['list'] + '\n━━━━━━━━━━━━━━━━━━━━\n'
         for row in rows:
-            text += '┣['
-            text += row[0]
+            text += '\u2022 '
+            text += "<code>" + row[0] + "</code>"
             text += '\n'
 
-        text += '┗━━━━━━━━━━━━━━━━━━━\n'
+        text += '\n'
         text += trans['note']['notes']['instruction']
-        bot.reply_to(message, text)
+        await message.reply(text=text, parse_mode='HTML')
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def note(message):
+@dp.message_handler(commands='note')
+async def note(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
@@ -52,19 +51,20 @@ def note(message):
         conn.close()
 
         row = rows[0]
-        bot.forward_message(message.chat.id, message.chat.id, row[0])
+        await bot.forward_message(message.chat.id, message.chat.id, row[0])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def addnote(message):
+@dp.message_handler(commands='addnote')
+async def addnote(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
+        member = await bot.get_chat_member(chat_id=message.chat.id,
+                                           user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             words = message.text.split()
             name = words[1]
@@ -77,21 +77,22 @@ def addnote(message):
             conn.commit()
             conn.close()
 
-            bot.reply_to(message, trans['note']['addnote'])
+            await message.reply(trans['note']['addnote'])
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def delnote(message):
+@dp.message_handler(commands='rmnote')
+async def rmnote(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
     try:
-        member = bot.get_chat_member(chat_id=message.chat.id,
-                                     user_id=message.from_user.id)
+        member = await bot.get_chat_member(chat_id=message.chat.id,
+                                           user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             words = message.text.split()
             name = words[1]
@@ -104,15 +105,16 @@ def delnote(message):
             conn.commit()
             conn.close()
 
-            bot.reply_to(message, trans['note']['delnote'])
+            await message.reply(trans['note']['delnote'])
         else:
-            bot.reply_to(message, trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def text_handler(message):
+@dp.message_handler(lambda c: c.text[0] == '#')
+async def text_handler(message: Message):
     name = message.text[1:]
     conn = sqlite3.connect('data.db')
     curs = conn.cursor()
@@ -124,4 +126,4 @@ def text_handler(message):
     conn.close()
 
     row = rows[0]
-    bot.forward_message(message.chat.id, message.chat.id, row[0])
+    await bot.forward_message(message.chat.id, message.chat.id, row[0])

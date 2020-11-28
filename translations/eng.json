@@ -52,7 +52,7 @@
   "note": {
     "notes": {
       "list": "Notes list:",
-      "instruction": "You can retrieve these notes by using /note <note name> or #<note name>"
+      "instruction": "You can retrieve these notes by using /note (note name) or #(note name)"
     },
     "addnote": "Note added",
     "delnote": "Note removed"
