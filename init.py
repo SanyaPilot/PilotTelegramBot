@@ -1,7 +1,7 @@
 import sqlite3
 
 from aiogram import Bot, Dispatcher
-
+from aiogram.types import User
 import config
 from translation import TranslationWorker
 

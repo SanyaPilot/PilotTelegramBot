@@ -11,7 +11,8 @@
     "errors": {
       "default": "Oops... Something went wrong",
       "admin": "You need administrative privileges to do this",
-      "setup": "Setup is not complete!"
+      "setup": "Setup is not complete!",
+      "affect_on_bot": "Why are you trying to do this?"
     }
   },
   "ban": {
@@ -33,7 +34,11 @@
     "permit": "User @{username} was granted full user permissions",
     "permit_default": "User @{username} was granted default user permissions",
     "demote": "User @{username} was demoted",
-    "promote": "User @{username} was promoted (become admin now)"
+    "promote": "User @{username} was promoted (become admin now)",
+    "same_usr_err": ["Why are you trying to restrict yourself?", "Why are you trying to give permissions yourself?"],
+    "admin_err": ["Why are you trying to restrict admin?", "Why are you trying to give base permissions to admin?",
+      "Why are you trying to demote regular user?", "Why are you trying to promote admin again?"],
+    "unable_to_edit": "Sorry, but I can't edit admin status of this user because admin permissions were given not by me"
   },
   "greeting": {
     "greeting": "I want to chat!",
