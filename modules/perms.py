@@ -167,36 +167,36 @@ async def promote(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
-    #try:
-    member = await bot.get_chat_member(chat_id=message.chat.id,
-                                       user_id=message.from_user.id)
-    if member.status == 'creator' or member.status == 'administrator':
-        me = await bot.get_me()
-        if not message.reply_to_message.from_user.id == me.id:
-            member2 = await bot.get_chat_member(chat_id=message.chat.id,
-                                                user_id=message.reply_to_message.from_user.id)
-            if not message.from_user.id == message.reply_to_message.from_user.id:
-                if not (member2.status == 'creator' or member2.status == 'administrator'):
-                    await bot.promote_chat_member(chat_id=message.chat.id,
-                                                  user_id=message.reply_to_message.from_user.id,
-                                                  can_pin_messages=True,
-                                                  can_change_info=True,
-                                                  can_invite_users=True,
-                                                  can_delete_messages=True,
-                                                  can_promote_members=True,
-                                                  can_restrict_members=True
-                                                  )
-                    await bot.send_message(chat_id=message.chat.id,
-                                           text=trans['perms']['promote'].format(username=str(
-                                               message.reply_to_message.from_user.username)))
+    try:
+        member = await bot.get_chat_member(chat_id=message.chat.id,
+                                           user_id=message.from_user.id)
+        if member.status == 'creator' or member.status == 'administrator':
+            me = await bot.get_me()
+            if not message.reply_to_message.from_user.id == me.id:
+                member2 = await bot.get_chat_member(chat_id=message.chat.id,
+                                                    user_id=message.reply_to_message.from_user.id)
+                if not message.from_user.id == message.reply_to_message.from_user.id:
+                    if not (member2.status == 'creator' or member2.status == 'administrator'):
+                        await bot.promote_chat_member(chat_id=message.chat.id,
+                                                      user_id=message.reply_to_message.from_user.id,
+                                                      can_pin_messages=True,
+                                                      can_change_info=True,
+                                                      can_invite_users=True,
+                                                      can_delete_messages=True,
+                                                      can_promote_members=True,
+                                                      can_restrict_members=True
+                                                      )
+                        await bot.send_message(chat_id=message.chat.id,
+                                               text=trans['perms']['promote'].format(username=str(
+                                                   message.reply_to_message.from_user.username)))
+                    else:
+                        await message.reply(trans['perms']['admin_err'][3])
                 else:
-                    await message.reply(trans['perms']['admin_err'][3])
+                    await message.reply(trans['perms']['same_usr_err'][1])
             else:
-                await message.reply(trans['perms']['same_usr_err'][1])
+                await message.reply(trans['global']['errors']['affect_on_bot'])
         else:
-            await message.reply(trans['global']['errors']['affect_on_bot'])
-    else:
-        await message.reply(trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['admin'])
 
-    #except Exception:
-    #    await message.reply(trans['global']['errors']['default'])
+    except Exception:
+        await message.reply(trans['global']['errors']['default'])
