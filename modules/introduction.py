@@ -1,4 +1,4 @@
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ChatType
 from init import bot, dp, engine, Chats
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text, select, insert
@@ -10,8 +10,9 @@ import logging
 async def start(message: Message):
     connection = engine.connect()
     try:  
-        connection.execute(insert(Chats).values(chat_id=message.chat.id, setup_is_finished=False, greeting='', leave_msg=''))
-        logging.info("Юзер " + message.from_user.full_name + " был добавлен в БД")
+        if message.chat.type == ChatType.SUPER_GROUP or message.chat.type == ChatType.GROUP:
+            connection.execute(insert(Chats).values(chat_id=message.chat.id, setup_is_finished=False, greeting='', leave_msg=''))
+            logging.info("Чат " + message.chat.title + " был добавлен в БД")
     except Exception:
         pass
     await bot.send_message(message.chat.id, 'Хай, я бот для чата')
