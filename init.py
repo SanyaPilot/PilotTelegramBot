@@ -1,33 +1,45 @@
-import sqlite3
+import asyncio
+import logging
 
+import sqlalchemy as db
 from aiogram import Bot, Dispatcher
+from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String, select,
+                        text, create_engine)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, selectinload
+
 import config
-from translation import TranslationWorker
 
 bot = Bot(config.token)
 dp = Dispatcher(bot)
 
-tw = TranslationWorker()
 
-conn = sqlite3.connect('data.db')
-curs = conn.cursor()
+Base = declarative_base()
 
-table = """ CREATE TABLE IF NOT EXISTS notes (
-                id integer PRIMARY KEY,
-                name text NOT NULL,
-                message_id integer NOT NULL,
-                chat_id integer NOT NULL
-            ); """
-curs.execute(table)
 
-table = """ CREATE TABLE IF NOT EXISTS chats (
-                id integer PRIMARY KEY,
-                chat_id integer NOT NULL,
-                setup_is_finished integer NOT NULL,
-                greeting text,
-                leave_msg text,
-                language text
-            ); """
-curs.execute(table)
-conn.commit()
-conn.close()
+class Notes(Base):
+    __tablename__ = "notes"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    message_id = Column(Integer, nullable=False)
+    chat_id = Column(Integer, ForeignKey('chats.chat_id'))
+    chat = relationship("Chats", backref='Chat')
+
+
+class Chats(Base):
+    __tablename__ = "chats"
+    chat_id = Column(Integer, primary_key=True)
+    setup_is_finished = Column(Boolean, nullable=False)
+    greeting = Column(String)
+    leave_msg = Column(String)
+    language = Column(String, server_default=text('rus'))
+
+
+engine = create_engine(
+            "sqlite:///db.sqlite", 
+        )
+Base.metadata.create_all(engine)
+           
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)

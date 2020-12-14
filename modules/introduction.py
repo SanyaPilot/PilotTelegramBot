@@ -1,45 +1,23 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from init import bot, dp, tw
+from init import bot, dp, engine, Chats
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text, select, insert
 import sqlite3
+import logging
 
 
 @dp.message_handler(commands='start')
 async def start(message: Message):
-    conn = sqlite3.connect('data.db')
-    curs = conn.cursor()
-    curs.execute('SELECT chat_id FROM chats')
-    chats = curs.fetchall()
-    try:
-        if (message.chat.id,) in chats:
-            return
-    except IndexError:
+    connection = engine.connect()
+    try:  
+        connection.execute(insert(Chats).values(chat_id=message.chat.id, setup_is_finished=False, greeting='', leave_msg=''))
+        logging.info("Юзер " + message.from_user.full_name + " был добавлен в БД")
+    except Exception:
         pass
+    await bot.send_message(message.chat.id, 'Хай, я бот для чата')
+    
 
-    curs.execute('INSERT INTO chats(chat_id, setup_is_finished) VALUES(?,?)', (message.chat.id, 0))
-    conn.commit()
-
-    keyboard = InlineKeyboardMarkup(row_width=2)
-    for i in tw.available:
-        name = i.split('.')[0]
-        keyboard.add(InlineKeyboardButton(text=tw.get_labels()[name], callback_data=f'lang_{name}'))
-
-    # key_close = types.InlineKeyboardButton(text='Next >>', callback_data='setup_next')
-    # keyboard.add(key_close)
-    if 'eng.json' in tw.available:
-        curs.execute("""UPDATE chats
-                        SET language = ?,
-                            setup_is_finished = ?
-                        WHERE chat_id = ?""", ('eng', 1, message.chat.id))
-    else:
-        curs.execute("""UPDATE chats
-                        SET language = ?,
-                        setup_is_finished = ?
-                        WHERE chat_id = ?""", (tw.available[0].split('.')[0], 1, message.chat.id))
-    conn.commit()
-    conn.close()
-    trans = tw.get_translation(message)
-    await bot.send_message(message.chat.id, trans['introduction']['start'],
-                           reply_markup=keyboard)
+    
 
 
 @dp.message_handler(commands='help')
