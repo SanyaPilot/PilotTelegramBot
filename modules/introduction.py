@@ -1,24 +1,38 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ChatType
-from init import bot, dp, engine, Chats
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text, select, insert
-import sqlite3
+from init import bot, dp, tw, Chats, session
 import logging
 
 
 @dp.message_handler(commands='start')
 async def start(message: Message):
-    connection = engine.connect()
-    try:  
-        if message.chat.type == ChatType.SUPER_GROUP or message.chat.type == ChatType.GROUP:
-            connection.execute(insert(Chats).values(chat_id=message.chat.id, setup_is_finished=False, greeting='', leave_msg=''))
-            logging.info("Чат " + message.chat.title + " был добавлен в БД")
-    except Exception:
-        pass
-    await bot.send_message(message.chat.id, 'Хай, я бот для чата')
-    
+    try:
+        if message.chat.type == ChatType.SUPERGROUP or message.chat.type == ChatType.GROUP:
+            if not session.query(Chats.chat_id).filter_by(chat_id=message.chat.id).first() == (message.chat.id,):
+                new_chat = Chats(chat_id=message.chat.id, setup_is_finished=False)
+                session.add(new_chat)
+                logging.info("Чат " + message.chat.title + " был добавлен в БД")
 
-    
+                keyboard = InlineKeyboardMarkup(row_width=2)
+                for i in tw.available:
+                    name = i.split('.')[0]
+                    keyboard.add(InlineKeyboardButton(text=tw.get_labels()[name], callback_data=f'lang_{name}'))
+
+                if 'eng.json' in tw.available:
+                    new_chat.language = 'eng'
+                    new_chat.setup_is_finished = True
+                else:
+                    new_chat.language = tw.available[0].split('.')[0]
+                    new_chat.setup_is_finished = True
+
+                session.commit()
+
+                trans = tw.get_translation(message)
+                await bot.send_message(message.chat.id, trans['introduction']['start'],
+                                       reply_markup=keyboard)
+            else:
+                logging.warning('Чат ' + message.chat.title + 'уже в БД! Игнорирую...')
+    except Exception as e:
+        logging.error(e)
 
 
 @dp.message_handler(commands='help')
@@ -27,14 +41,8 @@ async def help(message: Message):
     if trans == 1:
         return
 
-    conn = sqlite3.connect('data.db')
-    curs = conn.cursor()
-    curs.execute("""SELECT language FROM chats
-                    WHERE chat_id = ?
-                          AND setup_is_finished = ?""", (message.chat.id, 1))
-    rows = curs.fetchall()
-    conn.close()
-    if not rows:
+    lang = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id)
+    if not lang:
         text = trans['global']['errors']['setup']
     else:
         text = trans['introduction']['help']
@@ -47,17 +55,13 @@ async def help(message: Message):
 async def call_handler(call: CallbackQuery):
     trans = tw.get_translation(call)
     try:
-        conn = sqlite3.connect('data.db')
-        curs = conn.cursor()
         member = await bot.get_chat_member(chat_id=call.message.chat.id,
                                            user_id=call.message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            curs.execute("""UPDATE chats
-                            SET language = ?,
-                                setup_is_finished = ?
-                            WHERE chat_id = ?""", (call.data[5:], 1, call.message.chat.id))
-            conn.commit()
-            conn.close()
+            chat = session.query(Chats).filter_by(chat_id=call.message.chat.id).first()
+            chat.language = call.data[5:]
+            chat.setup_is_finished = True
+            session.commit()
             trans = tw.get_translation(call)
             await bot.answer_callback_query(callback_query_id=call.id,
                                             text=trans['lang_set'])

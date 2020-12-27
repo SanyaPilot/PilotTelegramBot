@@ -1,18 +1,16 @@
-import asyncio
 import logging
 
-import sqlalchemy as db
 from aiogram import Bot, Dispatcher
-from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String, select,
+from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String,
                         text, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, selectinload
+from sqlalchemy.orm import relationship, sessionmaker
 
 import config
+from translation import TranslationWorker
 
 bot = Bot(config.token)
 dp = Dispatcher(bot)
-
 
 Base = declarative_base()
 
@@ -40,6 +38,9 @@ engine = create_engine(
             "sqlite:///db.sqlite", 
         )
 Base.metadata.create_all(engine)
-           
+Session = sessionmaker(bind=engine)
+session = Session()
+
+tw = TranslationWorker(session, Chats)
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)

@@ -1,6 +1,6 @@
 {
   "label": "English \ud83c\uddec\ud83c\udde7",
-  "id": "eng",
+  "id": "en",
   "lang_set": "Okay! Language is set to english!",
   "global": {
     "errors": {
@@ -17,12 +17,13 @@
     "unban": "User @{username} was unbanned\nNow he/she can return to the chat",
     "no_force_err": "In default case I can't ban admins.\nIf you are really sure in your actions, add --force flag",
     "admin_err": "Unfortunately, I can't ban this admin because admin privileges were given not by me",
-    "same_usr_err": ["Why are you trying to ban yourself with this command? If you really want this, use /banme"],
+    "same_usr_err": "Why are you trying to ban yourself with this command? If you really want this, use /banme",
     "tban_too_few": "You can't ban user for less than 30 seconds",
     "user_not_banned": "This user isn't banned"
   },
   "kick": {
-    "kick": "User @{username} was kicked\nHe/she will be able to return to the chat"
+    "kick": "User @{username} was kicked\nHe/she will be able to return to the chat",
+    "same_usr_err": "Why are you trying to kick yourself with this command? If you really want this, use /kickme"
   },
   "mute": {
     "mute": "User @{username} was muted",
@@ -61,7 +62,8 @@
       "instruction": "You can retrieve these notes by using /note (note name) or #(note name)"
     },
     "addnote": "Note added",
-    "delnote": "Note removed"
+    "delnote": "Note removed",
+    "dublicate_err": "Such note is exists"
   },
   "translate": {
     "tr": ""

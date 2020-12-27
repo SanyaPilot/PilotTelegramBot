@@ -1,10 +1,11 @@
-import sqlite3
 import json
 import os
 
 
 class TranslationWorker:
-    def __init__(self):
+    def __init__(self, session, chat):
+        self.session = session
+        self.Chats = chat
         self.available = os.listdir('translations')
         text = 'Available translations:'
         for i in self.available:
@@ -32,16 +33,11 @@ class TranslationWorker:
 
         return labels
 
-    @staticmethod
-    def get_lang(data):
-        conn = sqlite3.connect('data.db')
-        curs = conn.cursor()
+    def get_lang(self, data):
         try:
             chat_id = data.chat.id
         except AttributeError:
             chat_id = data.message.chat.id
 
-        curs.execute('SELECT language FROM chats WHERE chat_id = ?', (chat_id,))
-        rows = curs.fetchall()
-        conn.close()
-        return rows[0][0]
+        lang = self.session.query(self.Chats.language).filter_by(chat_id=chat_id).first()[0]
+        return lang

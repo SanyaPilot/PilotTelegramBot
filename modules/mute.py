@@ -1,7 +1,9 @@
 import time
-
+import datetime
+from utils.timedelta import parse_timedelta_from_message
 from aiogram.types import Message
 from init import dp, tw, bot
+from babel.dates import format_timedelta
 
 
 # Мут навсегда
@@ -10,96 +12,67 @@ async def mute(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
+
+    duration = await parse_timedelta_from_message(message)
+    if not duration:
+        return
     try:
         member = await bot.get_chat_member(chat_id=message.chat.id,
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            if len(message.text.split()) > 1:
-                words = message.text.split()
-                timeout = words[1]
-                timeout_units = timeout[-1:]
-                timeout_numbers = timeout[:-1]
-                if timeout_units == 's' and int(timeout_numbers) < 30:
-                    await bot.send_message(chat_id=message.chat.id,
-                                           text=trans['mute']['tmute_too_few'])
-                    return
-                final_timeout = None
-                timeout_text = None
-                if str(type(tw.get_translation(message)['global']['time']['seconds'])) == "<class 'list'>":
-                    if timeout_units == 's':
-                        final_timeout = int(timeout_numbers)
-                        if int(timeout_numbers[-1:]) == 1:
-                            text = trans['global']['time']['seconds'][0]
-                        elif 2 <= int(timeout_numbers) <= 4:
-                            text = trans['global']['time']['seconds'][1]
+            me = await bot.get_me()
+            if not message.reply_to_message.from_user.id == me.id:
+                member2 = await bot.get_chat_member(chat_id=message.chat.id,
+                                                    user_id=message.reply_to_message.from_user.id)
+                if not message.from_user.id == message.reply_to_message.from_user.id:
+                    if member2.status == 'creator' or member2.status == 'administrator':
+                        if '--force' in message.get_args():
+                            if member2.can_be_edited:
+                                await bot.promote_chat_member(chat_id=message.chat.id,
+                                                              user_id=message.reply_to_message.from_user.id,
+                                                              can_pin_messages=False,
+                                                              can_change_info=False,
+                                                              can_invite_users=False,
+                                                              can_delete_messages=False,
+                                                              can_promote_members=False,
+                                                              can_restrict_members=False
+                                                              )
+                            else:
+                                await message.reply(trans['mute']['admin_err'])
+                                return
                         else:
-                            text = trans['global']['time']['seconds'][2]
-                        timeout_text = timeout_numbers + ' ' + text
-                    elif timeout_units == 'm':
-                        final_timeout = int(timeout_numbers) * 60
-                        if int(timeout_numbers[-1:]) == 1:
-                            text = trans['global']['time']['minutes'][0]
-                        elif 2 <= int(timeout_numbers) <= 4:
-                            text = trans['global']['time']['minutes'][1]
-                        else:
-                            text = trans['global']['time']['minutes'][2]
-                        timeout_text = timeout_numbers + ' ' + text
-                    elif timeout_units == 'h':
-                        final_timeout = int(timeout_numbers) * 3600
-                        if int(timeout_numbers) == 1:
-                            text = trans['global']['time']['hours'][0]
-                        elif 2 <= int(timeout_numbers) <= 4:
-                            text = trans['global']['time']['hours'][1]
-                        else:
-                            text = trans['global']['time']['hours'][2]
-                        timeout_text = timeout_numbers + ' ' + text
-                    elif timeout_units == 'd':
-                        final_timeout = int(timeout_numbers) * 86400
-                        if int(timeout_numbers) == 1:
-                            text = trans['global']['time']['days'][0]
-                        elif 2 <= int(timeout_numbers[-1:]) <= 4:
-                            text = trans['global']['time']['days'][1]
-                        else:
-                            text = trans['global']['time']['days'][2]
-                        timeout_text = timeout_numbers + ' ' + text
+                            await message.reply(trans['mute']['no_force_err'])
+                            return
 
+                    if duration != datetime.timedelta(hours=999999):
+                        if not duration < datetime.timedelta(seconds=30):
+                            await bot.restrict_chat_member(chat_id=message.chat.id,
+                                                           user_id=message.reply_to_message.from_user.id,
+                                                           can_send_messages=False,
+                                                           until_date=duration)
+
+                            await bot.send_message(chat_id=message.chat.id,
+                                                   text=trans['mute']['tmute'].format(
+                                                       username=str(message.reply_to_message.from_user.username),
+                                                       time=format_timedelta(
+                                                           duration, locale=trans['id'], granularity="seconds",
+                                                           format="long"
+                                                       )))
+                        else:
+                            await message.reply(trans['mute']['tmute_too_few'])
+                    else:
+                        await bot.restrict_chat_member(chat_id=message.chat.id,
+                                                       user_id=message.reply_to_message.from_user.id,
+                                                       can_send_messages=False,
+                                                       until_date=0)
+
+                        await bot.send_message(chat_id=message.chat.id,
+                                               text=trans['mute']['mute'].format(
+                                                   username=str(message.reply_to_message.from_user.username)))
                 else:
-                    if timeout_units == 's':
-                        final_timeout = int(timeout_numbers)
-                        text = trans['global']['time']['seconds']
-                        timeout_text = timeout_numbers + ' ' + text
-                    elif timeout_units == 'm':
-                        final_timeout = int(timeout_numbers) * 60
-                        text = trans['global']['time']['minutes']
-                        timeout_text = timeout_numbers + ' ' + text
-                    elif timeout_units == 'h':
-                        final_timeout = int(timeout_numbers) * 3600
-                        text = trans['global']['time']['hours']
-                        timeout_text = timeout_numbers + ' ' + text
-                    elif timeout_units == 'd':
-                        final_timeout = int(timeout_numbers) * 86400
-                        text = trans['global']['time']['days']
-                        timeout_text = timeout_numbers + ' ' + text
-
-                await bot.restrict_chat_member(chat_id=message.chat.id,
-                                               user_id=message.reply_to_message.from_user.id,
-                                               can_send_messages=False,
-                                               until_date=int(time.time()) + final_timeout)
-
-                await bot.send_message(chat_id=message.chat.id,
-                                       text=trans['mute']['tmute'].format(
-                                           username=str(message.reply_to_message.from_user.username),
-                                           time=timeout_text))
+                    await message.reply(trans['ban']['same_usr_err'][0])
             else:
-                await bot.restrict_chat_member(chat_id=message.chat.id,
-                                               user_id=message.reply_to_message.from_user.id,
-                                               can_send_messages=False,
-                                               until_date=0)
-
-                await bot.send_message(chat_id=message.chat.id,
-                                       text=trans['mute']['mute'].format(
-                                           username=str(message.reply_to_message.from_user.username)))
-
+                await message.reply(trans['global']['errors']['affect_on_bot'])
         else:
             await message.reply(trans['global']['errors']['admin'])
 
@@ -117,22 +90,33 @@ async def unmute(message: Message):
         member = await bot.get_chat_member(chat_id=message.chat.id,
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            chat = await bot.get_chat(chat_id=message.chat.id)
-            perms = chat.permissions
-            await bot.restrict_chat_member(chat_id=message.chat.id,
-                                           user_id=message.reply_to_message.from_user.id,
-                                           can_send_messages=True,
-                                           can_send_media_messages=perms.can_send_media_messages,
-                                           can_send_other_messages=perms.can_send_other_messages,
-                                           can_add_web_page_previews=perms.can_add_web_page_previews,
-                                           until_date=0)
+            me = await bot.get_me()
+            if not message.reply_to_message.from_user.id == me.id:
+                if not message.from_user.id == message.reply_to_message.from_user.id:
+                    member2 = await bot.get_chat_member(chat_id=message.chat.id,
+                                                        user_id=message.reply_to_message.from_user.id)
+                    if member2.status == 'restricted':
+                        chat = await bot.get_chat(chat_id=message.chat.id)
+                        perms = chat.permissions
+                        await bot.restrict_chat_member(chat_id=message.chat.id,
+                                                       user_id=message.reply_to_message.from_user.id,
+                                                       can_send_messages=True,
+                                                       can_send_media_messages=perms.can_send_media_messages,
+                                                       can_send_other_messages=perms.can_send_other_messages,
+                                                       can_add_web_page_previews=perms.can_add_web_page_previews,
+                                                       until_date=0)
 
-            await bot.send_message(chat_id=message.chat.id,
-                                   text=trans['mute']['unmute'].format(
-                                       username=str(message.reply_to_message.from_user.username)))
+                        await bot.send_message(chat_id=message.chat.id,
+                                               text=trans['mute']['unmute'].format(
+                                                   username=str(message.reply_to_message.from_user.username)))
+                    else:
+                        await message.reply(trans['mute']['user_not_muted'])
+                else:
+                    await message.reply(trans['global']['errors']['affect_on_bot'])
+            else:
+                await message.reply(trans['global']['errors']['affect_on_bot'])
         else:
             await message.reply(trans['global']['errors']['admin'])
 
-    except Exception as e:
+    except Exception:
         await message.reply(trans['global']['errors']['default'])
-        print(e)

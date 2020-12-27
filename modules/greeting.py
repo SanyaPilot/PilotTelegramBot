@@ -1,7 +1,6 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from init import bot, dp, tw
+from init import bot, dp, tw, Chats, session
 from threading import Timer
-import sqlite3
 
 timers = {}
 
@@ -12,15 +11,10 @@ async def greeting(message: Message):
     if trans == 1:
         return
     try:
-        conn = sqlite3.connect('data.db')
-        curs = conn.cursor()
-        curs.execute('SELECT * FROM chats WHERE chat_id = ?', (message.chat.id,))
-        result = curs.fetchall()
-        conn.close()
+        chat = session.query(Chats.setup_is_finished, Chats.greeting).filter_by(chat_id=message.chat.id).first()
         try:
-            row = result[0]
             new_user = message.new_chat_members[0]
-            if row[2] == 1 and row[3] and not new_user.is_bot:
+            if chat[0] and chat[1] and not new_user.is_bot:
                 keyboard = InlineKeyboardMarkup()
                 key = InlineKeyboardButton(text=trans['greeting']['greeting'], callback_data='captcha_ok')
                 keyboard.add(key)
@@ -28,7 +22,7 @@ async def greeting(message: Message):
                 await bot.send_message(chat_id=message.chat.id,
                                        reply_to_message_id=message.message_id,
                                        parse_mode='HTML',
-                                       text=row[3],
+                                       text=chat[1],
                                        reply_markup=keyboard)
 
                 await bot.restrict_chat_member(chat_id=message.chat.id,
@@ -77,20 +71,14 @@ async def set_greeting(message: Message):
         member = await bot.get_chat_member(chat_id=message.chat.id,
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            try:
-                conn = sqlite3.connect('data.db')
-                curs = conn.cursor()
-                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
-                result = curs.fetchall()
-                if result[0][0] == 1:
-                    curs.execute("""UPDATE chats
-                                    SET greeting = ?
-                                    WHERE chat_id = ?""", (message.reply_to_message.text, message.chat.id))
-                    conn.commit()
-                    await message.reply(trans['greeting']['set_greeting'])
+            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+            if result[0]:
+                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                chat.greeting = message.reply_to_message.text
+                session.commit()
+                await message.reply(trans['greeting']['set_greeting'])
 
-                conn.close()
-            except Exception:
+            else:
                 await message.reply(trans['global']['errors']['setup'])
         else:
             await message.reply(trans['global']['errors']['admin'])
@@ -107,20 +95,13 @@ async def rm_greeting(message: Message):
         member = await bot.get_chat_member(chat_id=message.chat.id,
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            try:
-                conn = sqlite3.connect('data.db')
-                curs = conn.cursor()
-                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
-                result = curs.fetchall()
-                if result[0][0] == 1:
-                    curs.execute("""UPDATE chats
-                                    SET greeting = ?
-                                    WHERE chat_id = ?""", ('', message.chat.id))
-                    conn.commit()
-                    await message.reply(trans['greeting']['rm_greeting'])
-
-                conn.close()
-            except Exception:
+            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+            if result[0]:
+                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                chat.greeting = ''
+                session.commit()
+                await message.reply(trans['greeting']['rm_greeting'])
+            else:
                 await message.reply(trans['global']['errors']['setup'])
         else:
             await message.reply(trans['global']['errors']['admin'])
@@ -137,20 +118,14 @@ async def set_user_leave_msg(message: Message):
         member = await bot.get_chat_member(chat_id=message.chat.id,
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            try:
-                conn = sqlite3.connect('data.db')
-                curs = conn.cursor()
-                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
-                result = curs.fetchall()
-                if result[0][0] == 1:
-                    curs.execute("""UPDATE chats
-                                    SET leave_msg = ?
-                                    WHERE chat_id = ?""", (message.reply_to_message.text, message.chat.id))
-                    conn.commit()
-                    await message.reply(trans['greeting']['set_user_leave_msg'])
+            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+            if result[0]:
+                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                chat.leave_msg = message.reply_to_message.text
+                session.commit()
+                await message.reply(trans['greeting']['set_user_leave_msg'])
 
-                conn.close()
-            except Exception:
+            else:
                 await message.reply(trans['global']['errors']['setup'])
         else:
             await message.reply(trans['global']['errors']['admin'])
@@ -167,20 +142,14 @@ async def rm_user_leave_msg(message: Message):
         member = await bot.get_chat_member(chat_id=message.chat.id,
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            try:
-                conn = sqlite3.connect('data.db')
-                curs = conn.cursor()
-                curs.execute('SELECT setup_is_finished FROM chats WHERE chat_id = ?', (message.chat.id,))
-                result = curs.fetchall()
-                if result[0][0] == 1:
-                    curs.execute("""UPDATE chats
-                                    SET leave_msg = ?
-                                    WHERE chat_id = ?""", ('', message.chat.id))
-                    conn.commit()
-                    await message.reply(trans['greeting']['rm_user_leave_msg'])
+            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+            if result[0]:
+                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                chat.leave_msg = ''
+                session.commit()
+                await message.reply(trans['greeting']['rm_user_leave_msg'])
 
-                conn.close()
-            except Exception:
+            else:
                 await message.reply(trans['global']['errors']['setup'])
         else:
             await message.reply(trans['global']['errors']['admin'])
@@ -194,18 +163,13 @@ async def user_leave_msg(message):
     if trans == 1:
         return
     try:
-        conn = sqlite3.connect('data.db')
-        curs = conn.cursor()
-        curs.execute('SELECT * FROM chats WHERE chat_id = ?', (message.chat.id,))
-        result = curs.fetchall()
-        conn.close()
+        chat = session.query(Chats.setup_is_finished, Chats.leave_msg).filter_by(chat_id=message.chat.id).first()
         try:
-            row = result[0]
-            if row[2] == 1 and row[4]:
+            if chat[0] and chat[1]:
                 await bot.send_message(chat_id=message.chat.id,
                                        reply_to_message_id=message.message_id,
                                        parse_mode='HTML',
-                                       text=row[4])
+                                       text=chat[1])
         except IndexError:
             pass
     except Exception:

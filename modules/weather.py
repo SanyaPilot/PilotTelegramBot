@@ -1,20 +1,18 @@
-import telebot
-import config
-from translation import tw
-from telebot import types
+from init import bot, dp, tw
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 import requests
 import json
 import time
 from geopy.geocoders import Nominatim
 
-bot = telebot.TeleBot(config.token)
 geolocator = Nominatim(user_agent="pilot_telegram_bot")
 
 forecasts = {}
 weathers = {}
 
 
-def weather(message):
+@dp.message_handler(commands='weather')
+async def weather(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
@@ -23,17 +21,17 @@ def weather(message):
         city_name = words[1]
         loc = geolocator.geocode(city_name)
         if loc is None:
-            bot.reply_to(message, trans['weather']['city_not_found_err'])
+            await bot.reply_to(message, trans['weather']['city_not_found_err'])
         else:
-            weather_message = bot.send_message(chat_id=message.chat.id,
-                                               text=trans['weather']['making_forecast'],
-                                               reply_to_message_id=message.message_id)
+            weather_message = await bot.send_message(chat_id=message.chat.id,
+                                                     text=trans['weather']['making_forecast'],
+                                                     reply_to_message_id=message.message_id)
 
             global weathers
             weathers[weather_message.message_id] = message.from_user.id
 
             response = requests.get('https://api.openweathermap.org/data/2.5/onecall?lat=' + str(loc.latitude) +
-                                    '&lon=' + str(loc.longitude) + '&appid=c1c0032b6ff3be83e44ab641e780fc3d&lang=RU' +
+                                    '&lon=' + str(loc.longitude) + '&appid=c1c0032b6ff3be83e44ab641e780fc3d&lang=' + trans['id'] +
                                     '&units=metric')
 
             data = json.loads(response.content)
@@ -60,21 +58,22 @@ def weather(message):
             text += trans['weather']['cloudiness'].format(cloudiness=str(data['current']['clouds'])) + '\n'
             text += trans['weather']['uvi'].format(uvi=str(data['current']['uvi']))
 
-            keyboard = types.InlineKeyboardMarkup()
-            key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'], callback_data='weather_close')
+            keyboard = InlineKeyboardMarkup()
+            key_close = InlineKeyboardButton(text=trans['weather']['close_button'], callback_data='weather_close')
             keyboard.add(key_close)
 
-            bot.edit_message_text(chat_id=message.chat.id,
-                                  message_id=weather_message.message_id,
-                                  text=text,
-                                  parse_mode='HTML',
-                                  reply_markup=keyboard)
+            await bot.edit_message_text(chat_id=message.chat.id,
+                                        message_id=weather_message.message_id,
+                                        text=text,
+                                        parse_mode='HTML',
+                                        reply_markup=keyboard)
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def forecast(message):
+@dp.message_handler(commands='forecast')
+async def forecast(message: Message):
     trans = tw.get_translation(message)
     if trans == 1:
         return
@@ -83,17 +82,17 @@ def forecast(message):
         city_name = words[1]
         loc = geolocator.geocode(city_name)
         if loc is None:
-            bot.reply_to(message, trans['weather']['city_not_found_err'])
+            await bot.reply_to(message, trans['weather']['city_not_found_err'])
         else:
-            forecast_message = bot.send_message(chat_id=message.chat.id,
-                                                text=trans['weather']['making_forecast'],
-                                                reply_to_message_id=message.message_id)
+            forecast_message = await bot.send_message(chat_id=message.chat.id,
+                                                      text=trans['weather']['making_forecast'],
+                                                      reply_to_message_id=message.message_id)
 
             global forecasts
             forecasts[forecast_message.message_id] = []
 
             response = requests.get('https://api.openweathermap.org/data/2.5/onecall?lat=' + str(loc.latitude) +
-                                    '&lon=' + str(loc.longitude) + '&appid=c1c0032b6ff3be83e44ab641e780fc3d&lang=RU' +
+                                    '&lon=' + str(loc.longitude) + '&appid=c1c0032b6ff3be83e44ab641e780fc3d&lang=' + trans['id'] +
                                     '&units=metric')
 
             data = json.loads(response.content)
@@ -134,25 +133,26 @@ def forecast(message):
             forecasts[forecast_message.message_id].append(0)
             forecasts[forecast_message.message_id].append(message.from_user.id)
 
-            keyboard = types.InlineKeyboardMarkup(row_width=2)
-            key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
-            key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
+            keyboard = InlineKeyboardMarkup(row_width=2)
+            key_prev = InlineKeyboardButton(text='<<', callback_data='forecast_prev')
+            key_next = InlineKeyboardButton(text='>>', callback_data='forecast_next')
             keyboard.add(key_prev, key_next)
-            key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'],
-                                               callback_data='forecast_close')
+            key_close = InlineKeyboardButton(text=trans['weather']['close_button'],
+                                             callback_data='forecast_close')
             keyboard.add(key_close)
 
-            bot.edit_message_text(chat_id=message.chat.id,
-                                  message_id=forecast_message.message_id,
-                                  text=forecasts[forecast_message.message_id][0],
-                                  parse_mode='HTML',
-                                  reply_markup=keyboard)
+            await bot.edit_message_text(chat_id=message.chat.id,
+                                        message_id=forecast_message.message_id,
+                                        text=forecasts[forecast_message.message_id][0],
+                                        parse_mode='HTML',
+                                        reply_markup=keyboard)
 
     except Exception:
-        bot.reply_to(message, trans['global']['errors']['default'])
+        await message.reply(trans['global']['errors']['default'])
 
 
-def call_handler(call):
+@dp.callback_query_handler(lambda c: 'weather' in c.data or 'forecast' in c.data)
+async def call_handler(call):
     trans = tw.get_translation(call)
     if trans == 1:
         return
@@ -160,62 +160,62 @@ def call_handler(call):
         if call.from_user.id == forecasts[call.message.message_id][9]:
             if not forecasts[call.message.message_id][8] <= 0:
                 forecasts[call.message.message_id][8] -= 1
-                keyboard = types.InlineKeyboardMarkup(row_width=2)
-                key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
-                key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
+                keyboard = InlineKeyboardMarkup(row_width=2)
+                key_prev = InlineKeyboardButton(text='<<', callback_data='forecast_prev')
+                key_next = InlineKeyboardButton(text='>>', callback_data='forecast_next')
                 keyboard.add(key_prev, key_next)
-                key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'],
-                                                       callback_data='forecast_close')
+                key_close = InlineKeyboardButton(text=trans['weather']['close_button'],
+                                                 callback_data='forecast_close')
                 keyboard.add(key_close)
 
-                bot.edit_message_text(chat_id=call.message.chat.id,
-                                      message_id=call.message.message_id,
-                                      text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
-                                      parse_mode='HTML',
-                                      reply_markup=keyboard)
+                await bot.edit_message_text(chat_id=call.message.chat.id,
+                                            message_id=call.message.message_id,
+                                            text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
+                                            parse_mode='HTML',
+                                            reply_markup=keyboard)
             else:
-                bot.answer_callback_query(callback_query_id=call.id,
-                                          text=trans['weather']['forecast']['start_of_list'])
+                await bot.answer_callback_query(callback_query_id=call.id,
+                                                text=trans['weather']['forecast']['start_of_list'])
         else:
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text=trans['weather']['forecast']['other_user_err'])
+            await bot.answer_callback_query(callback_query_id=call.id,
+                                            text=trans['weather']['forecast']['other_user_err'])
 
     elif call.data == 'forecast_next':
         if call.from_user.id == forecasts[call.message.message_id][9]:
             if not forecasts[call.message.message_id][8] >= 7:
                 forecasts[call.message.message_id][8] += 1
-                keyboard = types.InlineKeyboardMarkup(row_width=2)
-                key_prev = types.InlineKeyboardButton(text='<<', callback_data='forecast_prev')
-                key_next = types.InlineKeyboardButton(text='>>', callback_data='forecast_next')
+                keyboard = InlineKeyboardMarkup(row_width=2)
+                key_prev = InlineKeyboardButton(text='<<', callback_data='forecast_prev')
+                key_next = InlineKeyboardButton(text='>>', callback_data='forecast_next')
                 keyboard.add(key_prev, key_next)
-                key_close = types.InlineKeyboardButton(text=trans['weather']['close_button'],
-                                                       callback_data='forecast_close')
+                key_close = InlineKeyboardButton(text=trans['weather']['close_button'],
+                                                 callback_data='forecast_close')
                 keyboard.add(key_close)
 
-                bot.edit_message_text(chat_id=call.message.chat.id,
-                                      message_id=call.message.message_id,
-                                      text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
-                                      parse_mode='HTML',
-                                      reply_markup=keyboard)
+                await bot.edit_message_text(chat_id=call.message.chat.id,
+                                            message_id=call.message.message_id,
+                                            text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
+                                            parse_mode='HTML',
+                                            reply_markup=keyboard)
             else:
-                bot.answer_callback_query(callback_query_id=call.id,
-                                          text=trans['weather']['forecast']['end_of_list'])
+                await bot.answer_callback_query(callback_query_id=call.id,
+                                                text=trans['weather']['forecast']['end_of_list'])
         else:
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text=trans['weather']['forecast']['other_user_err'])
+            await bot.answer_callback_query(callback_query_id=call.id,
+                                            text=trans['weather']['forecast']['other_user_err'])
 
     elif call.data == 'forecast_close':
         if call.from_user.id == forecasts[call.message.message_id][9]:
             forecasts.pop(call.message.message_id)
-            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         else:
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text=trans['weather']['forecast']['other_user_err'])
+            await bot.answer_callback_query(callback_query_id=call.id,
+                                            text=trans['weather']['forecast']['other_user_err'])
 
     elif call.data == 'weather_close':
         if call.from_user.id == weathers[call.message.message_id]:
             weathers.pop(call.message.message_id)
-            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         else:
-            bot.answer_callback_query(callback_query_id=call.id,
-                                      text=trans['weather']['forecast']['other_user_err'])
+            await bot.answer_callback_query(callback_query_id=call.id,
+                                            text=trans['weather']['forecast']['other_user_err'])
