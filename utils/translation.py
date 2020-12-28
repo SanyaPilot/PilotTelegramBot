@@ -1,12 +1,13 @@
 import json
 import os
+import config
 
 
 class TranslationWorker:
     def __init__(self, session, chat):
         self.session = session
         self.Chats = chat
-        self.available = os.listdir('translations')
+        self.available = os.listdir('../translations')
         text = 'Available translations:'
         for i in self.available:
             text += ' ' + i.split('.')[0]
@@ -20,9 +21,12 @@ class TranslationWorker:
 
         print('Translations loaded')
 
-    def get_translation(self, data):
+    def get_translation(self, data, default=False):
         try:
-            return self.translations[self.get_lang(data)]
+            if not default:
+                return self.translations[self.get_lang(data)]
+            else:
+                return self.translations[config.default_lang.split('.')[0]]
         except IndexError:
             return 1
 

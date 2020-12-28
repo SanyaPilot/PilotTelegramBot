@@ -1,34 +1,28 @@
-import telebot
+from init import bot, dp, tw, Chats, session
+from aiogram.types import Message
 import config
-from translation import tw
-import sqlite3
-
-bot = telebot.TeleBot(config.token)
+import logging
 
 
-def broadcast(message):
-    trans = tw.get_translation(message)
+@dp.message_handler(commands='broadcast')
+async def broadcast(message: Message):
+    trans = tw.get_translation(message, default=True)
     if trans == 1:
         return
     if message.from_user.username == config.owner_username:
         try:
-            conn = sqlite3.connect('data.db')
-            curs = conn.cursor()
-            curs.execute('SELECT chat_id FROM chats')
-            rows = curs.fetchall()
-            conn.close()
+            chat_ids = session.query(Chats.chat_id).all()
 
-            msg = bot.send_message(chat_id=message.chat.id, text=trans['admin']['broadcast']['start'])
+            msg = await bot.send_message(chat_id=message.chat.id, text=trans['admin']['broadcast']['start'])
 
             i = 0
-            for row in rows:
-                if not row[0] > 0:
-                    bot.send_message(chat_id=row[0], text=message.text.split(' ', 1)[1])
-                    i += 1
-                    bot.edit_message_text(chat_id=msg.chat.id, message_id=msg.message_id,
-                                          text=trans['admin']['broadcast']['process'].format(count=str(i)))
+            for chat_id in chat_ids:
+                await bot.send_message(chat_id=chat_id[0], text=message.text.split(' ', 1)[1])
+                i += 1
+                await bot.edit_message_text(chat_id=msg.chat.id, message_id=msg.message_id,
+                                            text=trans['admin']['broadcast']['process'].format(count=str(i)))
 
-            bot.edit_message_text(chat_id=msg.chat.id, message_id=msg.message_id,
-                                  text=trans['admin']['broadcast']['end'].format(count=str(i)))
+            await bot.edit_message_text(chat_id=msg.chat.id, message_id=msg.message_id,
+                                        text=trans['admin']['broadcast']['end'].format(count=str(i)))
         except Exception as e:
-            print(e)
+            logging.error(e)

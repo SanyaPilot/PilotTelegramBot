@@ -31,8 +31,8 @@ async def greeting(message: Message):
                                                until_date=0)
 
                 global timers
-                timers[message.from_user.id] = Timer(300.0, kick_bot, [message.chat.id, message.from_user.id, message])
-                timers[message.from_user.id].start()
+                timers[message.new_chat_members[0].id] = Timer(300.0, kick_bot, [message.chat.id, message.new_chat_members[0].id, message])
+                timers[message.new_chat_members[0].id].start()
         except IndexError:
             pass
     except Exception:

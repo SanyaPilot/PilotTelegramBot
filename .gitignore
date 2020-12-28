@@ -1,5 +1,5 @@
 config.py
-data.db
+db.sqlite
 .idea/
 __pycache__/
 venv/

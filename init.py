@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
 import config
-from translation import TranslationWorker
+from utils.translation import TranslationWorker
 
 bot = Bot(config.token)
 dp = Dispatcher(bot)

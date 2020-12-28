@@ -168,6 +168,7 @@ async def call_handler(call):
                                                  callback_data='forecast_close')
                 keyboard.add(key_close)
 
+                await bot.answer_callback_query(callback_query_id=call.id)
                 await bot.edit_message_text(chat_id=call.message.chat.id,
                                             message_id=call.message.message_id,
                                             text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
@@ -192,6 +193,7 @@ async def call_handler(call):
                                                  callback_data='forecast_close')
                 keyboard.add(key_close)
 
+                await bot.answer_callback_query(callback_query_id=call.id)
                 await bot.edit_message_text(chat_id=call.message.chat.id,
                                             message_id=call.message.message_id,
                                             text=forecasts[call.message.message_id][forecasts[call.message.message_id][8]],
