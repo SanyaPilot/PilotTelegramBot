@@ -7,7 +7,7 @@ class TranslationWorker:
     def __init__(self, session, chat):
         self.session = session
         self.Chats = chat
-        self.available = os.listdir('../translations')
+        self.available = os.listdir('translations')
         text = 'Available translations:'
         for i in self.available:
             text += ' ' + i.split('.')[0]

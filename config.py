@@ -2,3 +2,5 @@
 token = 'put here your token'
 # Bot owner's username
 owner_username = 'alexander_baransky496'
+# Default language configuration file
+default_lang = 'eng.json'
