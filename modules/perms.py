@@ -1,5 +1,6 @@
 from aiogram.types import Message
 from init import bot, dp, tw
+from loguru import logger
 
 
 @dp.message_handler(commands='restrict')
@@ -24,17 +25,27 @@ async def restrict(message: Message):
                         await bot.send_message(chat_id=message.chat.id,
                                                text=trans['perms']['restrict'].format(
                                                    username=str(message.reply_to_message.from_user.username)))
+                        logger.info(f"{message.chat.full_name}: restrict {message.reply_to_message.from_user.full_name}")
                     else:
                         await message.reply(trans['perms']['admin_err'][0])
+                        logger.warning(
+                            f"{message.chat.full_name}: {message.from_user.full_name} Why are you trying to restrict admin?")
                 else:
                     await message.reply(trans['perms']['same_usr_err'][0])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} wanted to restrict myself")
             else:
                 await message.reply(trans['global']['errors']['affect_on_bot'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} Why are you trying to do this?")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='permit')
@@ -63,17 +74,28 @@ async def permit(message: Message):
                         await bot.send_message(chat_id=message.chat.id,
                                                text=trans['perms']['permit'].format(
                                                    username=str(message.reply_to_message.from_user.username)))
+                        logger.info(
+                            f"{message.chat.full_name}: permit {message.reply_to_message.from_user.full_name}")
                     else:
                         await message.reply(trans['perms']['admin_err'][1])
+                        logger.warning(
+                            f"{message.chat.full_name}: {message.from_user.full_name} Why are you trying to give base permissions to admin?")
                 else:
                     await message.reply(trans['perms']['same_usr_err'][1])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} wanted to permit myself")
             else:
                 await message.reply(trans['global']['errors']['affect_on_bot'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} Why are you trying to do this?")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='dpermit')
@@ -104,17 +126,28 @@ async def permit_default(message: Message):
                         await bot.send_message(chat_id=message.chat.id,
                                                text=trans['perms']['permit_default'].format(username=str(
                                                    message.reply_to_message.from_user.username)))
+                        logger.info(
+                            f"{message.chat.full_name}: dpermit {message.reply_to_message.from_user.full_name}")
                     else:
                         await message.reply(trans['perms']['admin_err'][1])
+                        logger.warning(
+                            f"{message.chat.full_name}: {message.from_user.full_name} Why are you trying to give base permissions to admin?")
                 else:
                     await message.reply(trans['perms']['same_usr_err'][1])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} wanted to dpermit myself")
             else:
                 await message.reply(trans['global']['errors']['affect_on_bot'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} Why are you trying to do this?")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 # Убрать все права
@@ -146,19 +179,30 @@ async def demote(message: Message):
                             await bot.send_message(chat_id=message.chat.id,
                                                    text=trans['perms']['demote'].format(username=str(
                                                        message.reply_to_message.from_user.username)))
+                            logger.info(
+                                f"{message.chat.full_name}: demote {message.reply_to_message.from_user.full_name}")
                         else:
                             await message.reply(trans['perms']['unable_to_edit'])
                     else:
                         await message.reply(trans['perms']['admin_err'][2])
+                        logger.warning(
+                            f"{message.chat.full_name}: {message.from_user.full_name} Why are you trying to restrict admin?")
                 else:
                     await message.reply(trans['perms']['same_usr_err'][0])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} wanted to demote myself")
             else:
                 await message.reply(trans['global']['errors']['affect_on_bot'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} Why are you trying to do this?")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 # Дать все права
@@ -189,14 +233,23 @@ async def promote(message: Message):
                         await bot.send_message(chat_id=message.chat.id,
                                                text=trans['perms']['promote'].format(username=str(
                                                    message.reply_to_message.from_user.username)))
+                        logger.info(f"{message.chat.full_name}: new Admin {message.reply_to_message.from_user.full_nam}")
                     else:
                         await message.reply(trans['perms']['admin_err'][3])
+                        logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} Why are you trying to restrict admin?")
                 else:
                     await message.reply(trans['perms']['same_usr_err'][1])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} wanted to promote myself")
             else:
                 await message.reply(trans['global']['errors']['affect_on_bot'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} Why are you trying to do this?")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")

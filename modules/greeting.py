@@ -1,6 +1,7 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from init import bot, dp, tw, Chats, session
 from threading import Timer
+from loguru import logger
 
 timers = {}
 
@@ -29,14 +30,17 @@ async def greeting(message: Message):
                                                user_id=new_user.id,
                                                can_send_messages=False,
                                                until_date=0)
-
+                logger.info(
+                    f"{message.chat.full_name}: New user {new_user.full_name}")
                 global timers
                 timers[message.new_chat_members[0].id] = Timer(300.0, kick_bot, [message.chat.id, message.new_chat_members[0].id, message])
                 timers[message.new_chat_members[0].id].start()
         except IndexError:
             pass
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(
+            f"{message.chat.full_name}: {err}")
 
 
 async def kick_bot(chat_id, user_id, message):
@@ -57,7 +61,8 @@ async def kick_bot(chat_id, user_id, message):
                                text=trans['greeting']['kick_bot'].format(username=str(user.username)))
         global timers
         timers.pop(user_id)
-
+        logger.info(
+            f"{message.chat.full_name}: is bot {user.full_name}")
     except Exception:
         pass
 
@@ -77,13 +82,17 @@ async def set_greeting(message: Message):
                 chat.greeting = message.reply_to_message.text
                 session.commit()
                 await message.reply(trans['greeting']['set_greeting'])
-
+                logger.info(f"{message.chat.full_name}: new greeting")
             else:
                 await message.reply(trans['global']['errors']['setup'])
+                logger.warning(f"{message.chat.full_name}: setup greeting")
         else:
             await message.reply(trans['global']['errors']['admin'])
-    except Exception:
+            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(
+            f"{message.chat.full_name}: {err}")
 
 
 @dp.message_handler(commands='rmgreeting')
@@ -101,12 +110,17 @@ async def rm_greeting(message: Message):
                 chat.greeting = ''
                 session.commit()
                 await message.reply(trans['greeting']['rm_greeting'])
+                logger.info(f"{message.chat.full_name}: rm greeting")
             else:
                 await message.reply(trans['global']['errors']['setup'])
+                logger.warning(f"{message.chat.full_name}: setup greeting")
         else:
             await message.reply(trans['global']['errors']['admin'])
-    except Exception:
+            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(
+            f"{message.chat.full_name}: {err}")
 
 
 @dp.message_handler(commands='setleavemsg')
@@ -124,13 +138,17 @@ async def set_user_leave_msg(message: Message):
                 chat.leave_msg = message.reply_to_message.text
                 session.commit()
                 await message.reply(trans['greeting']['set_user_leave_msg'])
-
+                logger.info(f"{message.chat.full_name}: new leave user msg")
             else:
                 await message.reply(trans['global']['errors']['setup'])
+                logger.warning(f"{message.chat.full_name}: setup greeting")
         else:
             await message.reply(trans['global']['errors']['admin'])
-    except Exception:
+            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(
+                f"{message.chat.full_name}: {err}")
 
 
 @dp.message_handler(commands='rmleavemsg')
@@ -148,13 +166,17 @@ async def rm_user_leave_msg(message: Message):
                 chat.leave_msg = ''
                 session.commit()
                 await message.reply(trans['greeting']['rm_user_leave_msg'])
-
+                logger.info(f"{message.chat.full_name}: rm leave user msg")
             else:
                 await message.reply(trans['global']['errors']['setup'])
+                logger.warning(f"{message.chat.full_name}: setup greeting")
         else:
             await message.reply(trans['global']['errors']['admin'])
-    except Exception:
+            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(
+            f"{message.chat.full_name}: {err}")
 
 
 @dp.message_handler(content_types='left_chat_member')
@@ -170,10 +192,13 @@ async def user_leave_msg(message):
                                        reply_to_message_id=message.message_id,
                                        parse_mode='HTML',
                                        text=chat[1])
+                logger.info(f"{message.chat.full_name}: User {message.from_user.full_name} left")
         except IndexError:
             pass
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(
+            f"{message.chat.full_name}: {err}")
 
 
 @dp.callback_query_handler(lambda c: c.data == 'captcha_ok')
@@ -198,6 +223,10 @@ async def call_handler(call: CallbackQuery):
                                     message_id=call.message.message_id,
                                     text=trans['greeting']['check_success'])
         timers.pop(call.from_user.id)
-    except KeyError:
+        logger.info(f"{call.from_user.full_name} is not bot")
+    except KeyError as err:
         await bot.answer_callback_query(callback_query_id=call.id,
                                         text=trans['greeting']['other_user_err'])
+        logger.error(
+            f"{call.from_user.full_name}: {err}")
+

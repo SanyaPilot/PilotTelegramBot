@@ -2,7 +2,7 @@ from aiogram.types import Message
 from init import dp, tw
 import googletrans
 from googletrans import Translator
-import logging
+from loguru import logger
 
 translator = Translator()
 
@@ -25,6 +25,7 @@ async def tr(message: Message):
         text += 'Translate from <b>' + langs[result.src] + '</b> to <b>' + langs[lang_code] + '</b></i>\n\n' + \
                 result.text
         await message.reply(text=text, parse_mode='HTML')
-    except Exception as e:
+        logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - tr")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
-        logging.error(e)
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")

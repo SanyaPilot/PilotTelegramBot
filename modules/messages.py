@@ -1,6 +1,7 @@
 from aiogram.types import Message
 from init import bot, dp, tw
 from time import sleep
+from loguru import logger
 
 
 async def del_msgs(msgs, chat_id):
@@ -33,7 +34,9 @@ async def purge(message: Message):
 
             await del_msgs(msgs, chat_id)
             sent_msg = await bot.send_message(chat_id=chat_id, text=trans['messages']['purge'])
+            logger.info(f"{message.chat.full_name}: Purge completed")
             sleep(5)
             await bot.delete_message(chat_id=chat_id, message_id=sent_msg.message_id)
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")

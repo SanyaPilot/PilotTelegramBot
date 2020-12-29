@@ -1,6 +1,6 @@
 from aiogram.types import Message
 from init import bot, dp, tw, Notes, session
-import logging
+from loguru import logger
 
 
 @dp.message_handler(commands='notes')
@@ -18,10 +18,10 @@ async def notes(message: Message):
         text += '\n'
         text += trans['note']['notes']['instruction']
         await message.reply(text=text, parse_mode='HTML')
-
-    except Exception as e:
+        logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - notes")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
-        logging.error(e)
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='note')
@@ -33,9 +33,10 @@ async def note(message: Message):
         msg_id = session.query(Notes.message_id).filter_by(name=message.text.split()[1], chat_id=message.chat.id).first()
 
         await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
-
-    except Exception:
+        logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='addnote')
@@ -52,13 +53,18 @@ async def addnote(message: Message):
                 session.add(Notes(name=name, message_id=message.reply_to_message.message_id, chat_id=message.chat.id))
                 session.commit()
                 await message.reply(trans['note']['addnote'])
+                logger.info(f"{message.chat.full_name}: New note - {name}")
             else:
                 await message.reply(trans['note']['dublicate_err'])
+                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} - Such note is exists")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='rmnote')
@@ -73,14 +79,22 @@ async def rmnote(message: Message):
             session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
             session.commit()
             await message.reply(trans['note']['delnote'])
+            logger.info(f"{message.chat.full_name}: rm note - {message.text.split()[1]}")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(lambda c: c.text[0] == '#')
 async def text_handler(message: Message):
-    msg_id = session.query(Notes.message_id).filter_by(name=message.text[1:], chat_id=message.chat.id).first()
-    await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+    try:
+        msg_id = session.query(Notes.message_id).filter_by(name=message.text[1:], chat_id=message.chat.id).first()
+        await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+        logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - #{message.text[1:]}")
+    except Exception:
+        logger.warning(f"{message.chat.full_name}: this chat dont have {message.text[1:]}")

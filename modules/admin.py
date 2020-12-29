@@ -1,8 +1,7 @@
 from init import bot, dp, tw, Chats, session
 from aiogram.types import Message
 import config
-import logging
-
+from loguru import logger
 
 @dp.message_handler(commands='broadcast')
 async def broadcast(message: Message):
@@ -11,6 +10,7 @@ async def broadcast(message: Message):
         return
     if message.from_user.username == config.owner_username:
         try:
+            logger.info('The broadcast has begun')
             chat_ids = session.query(Chats.chat_id).all()
 
             msg = await bot.send_message(chat_id=message.chat.id, text=trans['admin']['broadcast']['start'])
@@ -24,5 +24,6 @@ async def broadcast(message: Message):
 
             await bot.edit_message_text(chat_id=msg.chat.id, message_id=msg.message_id,
                                         text=trans['admin']['broadcast']['end'].format(count=str(i)))
-        except Exception as e:
-            logging.error(e)
+            logger.info(f'Broadcast ended, messages sent: {str(i)}')
+        except Exception as err:
+            logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")

@@ -1,5 +1,3 @@
-import logging
-
 from aiogram import Bot, Dispatcher
 from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String,
                         text, create_engine)
@@ -42,5 +40,3 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 tw = TranslationWorker(session, Chats)
-
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)

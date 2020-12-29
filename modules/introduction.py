@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ChatType
 from init import bot, dp, tw, Chats, session
-import logging
+from loguru import logger
 
 
 @dp.message_handler(commands='start')
@@ -10,7 +10,7 @@ async def start(message: Message):
             if not session.query(Chats.chat_id).filter_by(chat_id=message.chat.id).first() == (message.chat.id,):
                 new_chat = Chats(chat_id=message.chat.id, setup_is_finished=False)
                 session.add(new_chat)
-                logging.info("Чат " + message.chat.title + " был добавлен в БД")
+                logger.info(f"New chat {message.chat.full_name}")
 
                 keyboard = InlineKeyboardMarkup(row_width=2)
                 for i in tw.available:
@@ -30,9 +30,9 @@ async def start(message: Message):
                 await bot.send_message(message.chat.id, trans['introduction']['start'],
                                        reply_markup=keyboard)
             else:
-                logging.warning('Чат ' + message.chat.title + 'уже в БД! Игнорирую...')
-    except Exception as e:
-        logging.error(e)
+                logger.warning(f"Non-new chat {message.chat.full_name}")
+    except Exception as err:
+        logger.error(f"{message.chat.full_name}: {err}")
 
 
 @dp.message_handler(commands='help')
@@ -49,6 +49,7 @@ async def help(message: Message):
 
     await bot.send_message(chat_id=message.chat.id,
                            text=text)
+    logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - {message.text}")
 
 
 @dp.callback_query_handler(lambda c: 'lang' in c.data)
@@ -79,6 +80,9 @@ async def call_handler(call: CallbackQuery):
         else:
             await bot.answer_callback_query(callback_query_id=call.id,
                                             text=trans['global']['errors']['admin'])
-    except Exception:
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
+    except Exception as err:
         await bot.answer_callback_query(callback_query_id=call.id,
                                         text=trans['global']['errors']['default'])
+        logger.error(f"{call.message.chat.full_name}: {err}")

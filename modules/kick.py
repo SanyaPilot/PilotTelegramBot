@@ -1,5 +1,6 @@
 from aiogram.types import Message
 from init import bot, dp, tw
+from loguru import logger
 
 
 @dp.message_handler(commands='kick')
@@ -30,9 +31,13 @@ async def kick(message: Message):
                                                               )
                             else:
                                 await message.reply(trans['ban']['admin_err'])
+                                logger.warning(
+                                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} I can't ban this admin because admin privileges were given not by me")
                                 return
                         else:
                             await message.reply(trans['ban']['no_force_err'])
+                            logger.warning(
+                                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} not --force flag")
                             return
 
                     await bot.kick_chat_member(chat_id=message.chat.id,
@@ -44,15 +49,23 @@ async def kick(message: Message):
                     await bot.send_message(chat_id=message.chat.id,
                                            text=trans['kick']['kick'].format(
                                                username=str(message.reply_to_message.from_user.username)))
+                    logger.info(f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} kicked")
                 else:
-                    await message.reply(trans['ban']['same_usr_err'])
+                    await message.reply(trans['ban']['same_usr_err'][0])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} wanted to kick myself")
             else:
                 await message.reply(trans['global']['errors']['affect_on_bot'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} Why are you trying to do this?")
         else:
             await message.reply(trans['global']['errors']['admin'])
+            logger.warning(
+                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='kickme')
@@ -77,9 +90,13 @@ async def kickme(message: Message):
                                                   )
                 else:
                     await message.reply(trans['ban']['admin_err'])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} I can't ban this admin because admin privileges were given not by me")
                     return
             else:
                 await message.reply(trans['ban']['no_force_err'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} not --force flag")
                 return
 
         await bot.kick_chat_member(chat_id=message.chat.id,
@@ -91,6 +108,8 @@ async def kickme(message: Message):
         await bot.send_message(chat_id=message.chat.id,
                                text=trans['kick']['kick'].format(
                                    username=str(message.from_user.username)))
+        logger.info(f"{message.chat.full_name}: User {message.from_user.full_name} kicked")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")

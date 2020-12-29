@@ -4,6 +4,7 @@ import requests
 import json
 import time
 from geopy.geocoders import Nominatim
+from loguru import logger
 
 geolocator = Nominatim(user_agent="pilot_telegram_bot")
 
@@ -22,6 +23,7 @@ async def weather(message: Message):
         loc = geolocator.geocode(city_name)
         if loc is None:
             await bot.reply_to(message, trans['weather']['city_not_found_err'])
+            logger.warning(f"{message.chat.full_name}: City not found")
         else:
             weather_message = await bot.send_message(chat_id=message.chat.id,
                                                      text=trans['weather']['making_forecast'],
@@ -67,9 +69,11 @@ async def weather(message: Message):
                                         text=text,
                                         parse_mode='HTML',
                                         reply_markup=keyboard)
+            logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - Weather")
 
-    except Exception:
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.message_handler(commands='forecast')
@@ -83,6 +87,7 @@ async def forecast(message: Message):
         loc = geolocator.geocode(city_name)
         if loc is None:
             await bot.reply_to(message, trans['weather']['city_not_found_err'])
+            logger.warning(f"{message.chat.full_name}: City not found")
         else:
             forecast_message = await bot.send_message(chat_id=message.chat.id,
                                                       text=trans['weather']['making_forecast'],
@@ -146,9 +151,10 @@ async def forecast(message: Message):
                                         text=forecasts[forecast_message.message_id][0],
                                         parse_mode='HTML',
                                         reply_markup=keyboard)
-
-    except Exception:
+            logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - forecast")
+    except Exception as err:
         await message.reply(trans['global']['errors']['default'])
+        logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
 @dp.callback_query_handler(lambda c: 'weather' in c.data or 'forecast' in c.data)

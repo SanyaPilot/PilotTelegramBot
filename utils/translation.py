@@ -1,6 +1,7 @@
 import json
 import os
 import config
+from loguru import logger
 
 
 class TranslationWorker:
@@ -11,15 +12,14 @@ class TranslationWorker:
         text = 'Available translations:'
         for i in self.available:
             text += ' ' + i.split('.')[0]
-        
-        print(text)
+
+        logger.info(text)
         self.translations = {}
         if self.available:
             for i in self.available:
                 with open(f'translations/{i}', 'r') as file:
                     self.translations[i.split('.')[0]] = json.load(file)
-
-        print('Translations loaded')
+        logger.info('Translations loaded')
 
     def get_translation(self, data, default=False):
         try:
