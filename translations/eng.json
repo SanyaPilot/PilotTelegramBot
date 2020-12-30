@@ -45,7 +45,7 @@
     "unable_to_edit": "Sorry, but I can't edit admin status of this user because admin permissions were given not by me"
   },
   "greeting": {
-    "greeting": "I want to chat!",
+    "greeting": ["I want to chat!", "No, I want't to chat!", "Maybe... no"],
     "kick_bot": "User @{username} failed bot check.\nIt was kicked",
     "set_greeting": "Greeting set successfully!",
     "rm_greeting": "Greeting removed successfully!",
