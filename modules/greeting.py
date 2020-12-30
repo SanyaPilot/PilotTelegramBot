@@ -73,22 +73,27 @@ async def set_greeting(message: Message):
     if trans == 1:
         return
     try:
-        member = await bot.get_chat_member(chat_id=message.chat.id,
-                                           user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
-            if result[0]:
-                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
-                chat.greeting = message.reply_to_message.text
-                session.commit()
-                await message.reply(trans['greeting']['set_greeting'])
-                logger.info(f"{message.chat.full_name}: new greeting")
+        if message.reply_to_message:
+            member = await bot.get_chat_member(chat_id=message.chat.id,
+                                               user_id=message.from_user.id)
+            if member.status == 'creator' or member.status == 'administrator':
+                result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+                if result[0]:
+                    chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                    chat.greeting = message.reply_to_message.text
+                    session.commit()
+                    await message.reply(trans['greeting']['set_greeting'])
+                    logger.info(f"{message.chat.full_name}: new greeting")
+                else:
+                    await message.reply(trans['global']['errors']['setup'])
+                    logger.warning(f"{message.chat.full_name}: setup greeting")
             else:
-                await message.reply(trans['global']['errors']['setup'])
-                logger.warning(f"{message.chat.full_name}: setup greeting")
+                await message.reply(trans['global']['errors']['admin'])
+                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
         else:
-            await message.reply(trans['global']['errors']['admin'])
-            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+            await message.reply(trans['global']['errors']['no_reply'])
+            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
+
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(
@@ -101,22 +106,27 @@ async def rm_greeting(message: Message):
     if trans == 1:
         return
     try:
-        member = await bot.get_chat_member(chat_id=message.chat.id,
-                                           user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
-            if result[0]:
-                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
-                chat.greeting = ''
-                session.commit()
-                await message.reply(trans['greeting']['rm_greeting'])
-                logger.info(f"{message.chat.full_name}: rm greeting")
+        if message.reply_to_message:
+            member = await bot.get_chat_member(chat_id=message.chat.id,
+                                               user_id=message.from_user.id)
+            if member.status == 'creator' or member.status == 'administrator':
+                result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+                if result[0]:
+                    chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                    chat.greeting = ''
+                    session.commit()
+                    await message.reply(trans['greeting']['rm_greeting'])
+                    logger.info(f"{message.chat.full_name}: rm greeting")
+                else:
+                    await message.reply(trans['global']['errors']['setup'])
+                    logger.warning(f"{message.chat.full_name}: setup greeting")
             else:
-                await message.reply(trans['global']['errors']['setup'])
-                logger.warning(f"{message.chat.full_name}: setup greeting")
+                await message.reply(trans['global']['errors']['admin'])
+                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
         else:
-            await message.reply(trans['global']['errors']['admin'])
-            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+            await message.reply(trans['global']['errors']['no_reply'])
+            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
+
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(
@@ -129,22 +139,27 @@ async def set_user_leave_msg(message: Message):
     if trans == 1:
         return
     try:
-        member = await bot.get_chat_member(chat_id=message.chat.id,
-                                           user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
-            if result[0]:
-                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
-                chat.leave_msg = message.reply_to_message.text
-                session.commit()
-                await message.reply(trans['greeting']['set_user_leave_msg'])
-                logger.info(f"{message.chat.full_name}: new leave user msg")
+        if message.reply_to_message:
+            member = await bot.get_chat_member(chat_id=message.chat.id,
+                                               user_id=message.from_user.id)
+            if member.status == 'creator' or member.status == 'administrator':
+                result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+                if result[0]:
+                    chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                    chat.leave_msg = message.reply_to_message.text
+                    session.commit()
+                    await message.reply(trans['greeting']['set_user_leave_msg'])
+                    logger.info(f"{message.chat.full_name}: new leave user msg")
+                else:
+                    await message.reply(trans['global']['errors']['setup'])
+                    logger.warning(f"{message.chat.full_name}: setup greeting")
             else:
-                await message.reply(trans['global']['errors']['setup'])
-                logger.warning(f"{message.chat.full_name}: setup greeting")
+                await message.reply(trans['global']['errors']['admin'])
+                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
         else:
-            await message.reply(trans['global']['errors']['admin'])
-            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+            await message.reply(trans['global']['errors']['no_reply'])
+            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
+
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(
@@ -157,22 +172,26 @@ async def rm_user_leave_msg(message: Message):
     if trans == 1:
         return
     try:
-        member = await bot.get_chat_member(chat_id=message.chat.id,
-                                           user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
-            if result[0]:
-                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
-                chat.leave_msg = ''
-                session.commit()
-                await message.reply(trans['greeting']['rm_user_leave_msg'])
-                logger.info(f"{message.chat.full_name}: rm leave user msg")
+        if message.reply_to_message:
+            member = await bot.get_chat_member(chat_id=message.chat.id,
+                                               user_id=message.from_user.id)
+            if member.status == 'creator' or member.status == 'administrator':
+                result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+                if result[0]:
+                    chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                    chat.leave_msg = ''
+                    session.commit()
+                    await message.reply(trans['greeting']['rm_user_leave_msg'])
+                    logger.info(f"{message.chat.full_name}: rm leave user msg")
+                else:
+                    await message.reply(trans['global']['errors']['setup'])
+                    logger.warning(f"{message.chat.full_name}: setup greeting")
             else:
-                await message.reply(trans['global']['errors']['setup'])
-                logger.warning(f"{message.chat.full_name}: setup greeting")
+                await message.reply(trans['global']['errors']['admin'])
+                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
         else:
-            await message.reply(trans['global']['errors']['admin'])
-            logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+            await message.reply(trans['global']['errors']['no_reply'])
+            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(

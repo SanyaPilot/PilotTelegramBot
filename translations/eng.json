@@ -8,7 +8,9 @@
       "admin": "You need administrative privileges to do this",
       "setup": "Setup is not complete!",
       "affect_on_bot": "Why are you trying to do this?",
-      "user_not_found": "Unfortunately, such user is not found"
+      "user_not_found": "Unfortunately, such user is not found",
+      "no_reply": "I don't know what to do with this, reply to the message please",
+      "no_args": "I don't know what to do with this, write command with right arguments please"
     }
   },
   "ban": {

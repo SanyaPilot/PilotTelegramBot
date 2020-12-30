@@ -7,8 +7,12 @@ from sqlalchemy.orm import relationship, sessionmaker
 import config
 from utils.translation import TranslationWorker
 
+from loguru import logger
+
+logger.info('Welcome to PilotTelegramBot!\nStarting init...')
 bot = Bot(config.token)
 dp = Dispatcher(bot)
+logger.info('AIOgram init                   [ OK ]')
 
 Base = declarative_base()
 
@@ -38,5 +42,8 @@ engine = create_engine(
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
+logger.info('SQL Alchemy init               [ OK ]')
 
 tw = TranslationWorker(session, Chats)
+logger.info('TranslationWorker init         [ OK ]')
+logger.info('Init finished! Starting polling...')

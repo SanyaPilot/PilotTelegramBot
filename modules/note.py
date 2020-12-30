@@ -30,10 +30,14 @@ async def note(message: Message):
     if trans == 1:
         return
     try:
-        msg_id = session.query(Notes.message_id).filter_by(name=message.text.split()[1], chat_id=message.chat.id).first()
+        if len(message.text.split()) == 2:
+            msg_id = session.query(Notes.message_id).filter_by(name=message.text.split()[1], chat_id=message.chat.id).first()
 
-        await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
-        logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
+            await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+            logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
+        else:
+            await message.reply(trans['global']['errors']['no_args'])
+            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without args')
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
@@ -45,23 +49,31 @@ async def addnote(message: Message):
     if trans == 1:
         return
     try:
-        member = await bot.get_chat_member(chat_id=message.chat.id,
-                                           user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            name = message.text.split()[1]
-            if not session.query(Notes.name).filter_by(name=name, chat_id=message.chat.id).first() == (name,):
-                session.add(Notes(name=name, message_id=message.reply_to_message.message_id, chat_id=message.chat.id))
-                session.commit()
-                await message.reply(trans['note']['addnote'])
-                logger.info(f"{message.chat.full_name}: New note - {name}")
+        if message.reply_to_message:
+            if len(message.text.split()) == 2:
+                member = await bot.get_chat_member(chat_id=message.chat.id,
+                                                   user_id=message.from_user.id)
+                if member.status == 'creator' or member.status == 'administrator':
+                    name = message.text.split()[1]
+                    if not session.query(Notes.name).filter_by(name=name, chat_id=message.chat.id).first() == (name,):
+                        session.add(Notes(name=name, message_id=message.reply_to_message.message_id, chat_id=message.chat.id))
+                        session.commit()
+                        await message.reply(trans['note']['addnote'])
+                        logger.info(f"{message.chat.full_name}: New note - {name}")
+                    else:
+                        await message.reply(trans['note']['dublicate_err'])
+                        logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} - Such note is exists")
+                else:
+                    await message.reply(trans['global']['errors']['admin'])
+                    logger.warning(
+                        f"{message.chat.full_name}: User {message.from_user.full_name} need administrative privileges to do this")
             else:
-                await message.reply(trans['note']['dublicate_err'])
-                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} - Such note is exists")
+                await message.reply(trans['global']['errors']['no_args'])
+                logger.warning(
+                    f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without args')
         else:
-            await message.reply(trans['global']['errors']['admin'])
-            logger.warning(
-                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
-
+            await message.reply(trans['global']['errors']['no_reply'])
+            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
@@ -73,18 +85,22 @@ async def rmnote(message: Message):
     if trans == 1:
         return
     try:
-        member = await bot.get_chat_member(chat_id=message.chat.id,
-                                           user_id=message.from_user.id)
-        if member.status == 'creator' or member.status == 'administrator':
-            session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
-            session.commit()
-            await message.reply(trans['note']['delnote'])
-            logger.info(f"{message.chat.full_name}: rm note - {message.text.split()[1]}")
+        if len(message.text.split()) == 2:
+            member = await bot.get_chat_member(chat_id=message.chat.id,
+                                               user_id=message.from_user.id)
+            if member.status == 'creator' or member.status == 'administrator':
+                session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
+                session.commit()
+                await message.reply(trans['note']['delnote'])
+                logger.info(f"{message.chat.full_name}: rm note - {message.text.split()[1]}")
+            else:
+                await message.reply(trans['global']['errors']['admin'])
+                logger.warning(
+                    f"{message.chat.full_name}: User {message.from_user.full_name} need administrative privileges to do this")
         else:
-            await message.reply(trans['global']['errors']['admin'])
+            await message.reply(trans['global']['errors']['no_args'])
             logger.warning(
-                f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} need administrative privileges to do this")
-
+                f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without args')
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
