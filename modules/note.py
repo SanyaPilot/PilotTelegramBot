@@ -62,7 +62,7 @@ async def addnote(message: Message):
                         logger.info(f"{message.chat.full_name}: New note - {name}")
                     else:
                         await message.reply(trans['note']['dublicate_err'])
-                        logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} - Such note is exists")
+                        logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} - Such note already exists")
                 else:
                     await message.reply(trans['global']['errors']['admin'])
                     logger.warning(
@@ -89,10 +89,14 @@ async def rmnote(message: Message):
             member = await bot.get_chat_member(chat_id=message.chat.id,
                                                user_id=message.from_user.id)
             if member.status == 'creator' or member.status == 'administrator':
-                session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
-                session.commit()
-                await message.reply(trans['note']['delnote'])
-                logger.info(f"{message.chat.full_name}: rm note - {message.text.split()[1]}")
+                if session.query(Notes.name).filter_by(name=message.text.split()[1], chat_id=message.chat.id).first():
+                    session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
+                    session.commit()
+                    await message.reply(trans['note']['delnote'])
+                    logger.info(f"{message.chat.full_name}: rm note - {message.text.split()[1]}")
+                else:
+                    await message.reply(trans['note']['no_such_note_err'])
+                    logger.warning(f"{message.chat.full_name}: Note {message.text.split()[1]} does not exist")
             else:
                 await message.reply(trans['global']['errors']['admin'])
                 logger.warning(

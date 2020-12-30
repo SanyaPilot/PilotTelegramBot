@@ -66,7 +66,8 @@
     },
     "addnote": "Note added",
     "delnote": "Note removed",
-    "dublicate_err": "Such note is exists"
+    "dublicate_err": "Such note already exists",
+    "no_such_note_err": "Such note does not exist"
   },
   "translate": {
     "tr": ""
