@@ -75,27 +75,35 @@ async def set_greeting(message: Message):
     if trans == 1:
         return
     try:
-        if message.reply_to_message:
-            member = await bot.get_chat_member(chat_id=message.chat.id,
-                                               user_id=message.from_user.id)
-            if member.status == 'creator' or member.status == 'administrator':
-                result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
-                if result[0]:
-                    chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
-                    chat.greeting = message.reply_to_message.text
-                    session.commit()
-                    await message.reply(trans['greeting']['set_greeting'])
-                    logger.info(f"{message.chat.full_name}: new greeting")
+        bot_obj = await bot.get_me()
+        bot_id = bot_obj.id
+        me = await bot.get_chat_member(chat_id=message.chat.id, user_id=bot_id)
+        if me.can_restrict_members:
+            if message.reply_to_message:
+                member = await bot.get_chat_member(chat_id=message.chat.id,
+                                                   user_id=message.from_user.id)
+                if member.status == 'creator' or member.status == 'administrator':
+                    result = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id).first()
+                    if result[0]:
+                        chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                        chat.greeting = message.reply_to_message.text
+                        session.commit()
+                        await message.reply(trans['greeting']['set_greeting'])
+                        logger.info(f"{message.chat.full_name}: new greeting")
+                    else:
+                        await message.reply(trans['global']['errors']['setup'])
+                        logger.warning(f"{message.chat.full_name}: setup greeting")
                 else:
-                    await message.reply(trans['global']['errors']['setup'])
-                    logger.warning(f"{message.chat.full_name}: setup greeting")
+                    await message.reply(trans['global']['errors']['admin'])
+                    logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
             else:
-                await message.reply(trans['global']['errors']['admin'])
-                logger.warning(f"{message.chat.full_name}: {message.from_user.full_name} not admin")
+                await message.reply(trans['global']['errors']['no_reply'])
+                logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
         else:
-            await message.reply(trans['global']['errors']['no_reply'])
-            logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without reply')
-
+            perm = 'can_restrict_members'
+            await message.reply(trans['global']['errors']['no_needed_perm'].format(perm=perm),
+                                parse_mode='HTML')
+            logger.warning(f"{message.chat.full_name}: Bot doesn't have perm {perm}")
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
         logger.error(
