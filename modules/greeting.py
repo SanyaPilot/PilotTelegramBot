@@ -17,8 +17,10 @@ async def greeting(message: Message):
             new_user = message.new_chat_members[0]
             if chat[0] and chat[1] and not new_user.is_bot:
                 keyboard = InlineKeyboardMarkup()
-                key = InlineKeyboardButton(text=trans['greeting']['greeting'], callback_data='captcha_ok')
-                keyboard.add(key)
+
+                keyboard.add(InlineKeyboardButton(text=trans['greeting']['greeting'][1], callback_data='captcha_no1'))
+                keyboard.add(InlineKeyboardButton(text=trans['greeting']['greeting'][0], callback_data='captcha_ok'))
+                keyboard.add(InlineKeyboardButton(text=trans['greeting']['greeting'][2], callback_data='captcha_no2'))
 
                 await bot.send_message(chat_id=message.chat.id,
                                        reply_to_message_id=message.message_id,
