@@ -73,7 +73,8 @@
     "no_such_note_err": "Такой заметки не существует"
   },
   "translate": {
-    "tr": "Перевод с <b>{src_lang}</b> на <b>{dest_lang}</b>"
+    "tr": "Перевод с <b>{src_lang}</b> на <b>{dest_lang}</b>",
+    "no_such_lang_err": "Язык <b>{lang}</b> не найден!"
   },
   "weather": {
     "city_not_found_err": "Такой город не найден",

@@ -70,7 +70,8 @@
     "no_such_note_err": "Such note does not exist"
   },
   "translate": {
-    "tr": ""
+    "tr": "",
+    "no_such_lang_err": "Language <b>{lang}</b> not found!"
   },
   "weather": {
     "city_not_found_err": "Such city is not found",

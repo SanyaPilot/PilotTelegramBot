@@ -16,7 +16,13 @@ async def tr(message: Message):
         if message.reply_to_message:
             words = message.text.split()
             lang_code = words[1]
-            result = translator.translate(text=message.reply_to_message.text, dest=lang_code)
+            try:
+                result = translator.translate(text=message.reply_to_message.text, dest=lang_code)
+            except Exception as e:
+                await message.reply(trans['translate']['no_such_lang_err'].format(lang=lang_code),
+                                    parse_mode='HTML')
+                logger.warning(f"{message.chat.full_name}: Lang {lang_code} is not found")
+                return
 
             langs = googletrans.LANGUAGES
             text = '<i>'
