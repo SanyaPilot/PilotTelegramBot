@@ -32,9 +32,19 @@ async def note(message: Message):
     try:
         if len(message.text.split()) == 2:
             msg_id = session.query(Notes.message_id).filter_by(name=message.text.split()[1], chat_id=message.chat.id).first()
-
-            await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
-            logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
+            if msg_id:
+                try:
+                    await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+                    logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
+                except Exception:
+                    session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
+                    session.commit()
+                    await message.reply(trans['note']['msg_not_found_err'].format(note=message.text.split()[1]),
+                                        parse_mode='HTML')
+                    logger.warning(f"{message.chat.full_name}: Reply msg for note {message.text.split()[1]} is not found")
+            else:
+                await message.reply(trans['note']['no_such_note_err'])
+                logger.warning(f"{message.chat.full_name}: Note {message.text.split()[1]} does not exist")
         else:
             await message.reply(trans['global']['errors']['no_args'])
             logger.warning(f'{message.chat.full_name}: User {message.from_user.full_name} tried to use command without args')
@@ -113,8 +123,19 @@ async def rmnote(message: Message):
 @dp.message_handler(lambda c: c.text[0] == '#')
 async def text_handler(message: Message):
     try:
-        msg_id = session.query(Notes.message_id).filter_by(name=message.text[1:], chat_id=message.chat.id).first()
-        await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
-        logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - #{message.text[1:]}")
-    except Exception:
-        logger.warning(f"{message.chat.full_name}: this chat dont have {message.text[1:]}")
+        msg_id = session.query(Notes.message_id).filter_by(name=message.text[1:],
+                                                           chat_id=message.chat.id).first()
+        if msg_id:
+            try:
+                await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+                logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
+            except Exception:
+                trans = tw.get_translation(message)
+                session.query(Notes).filter_by(name=message.text[1:], chat_id=message.chat.id).delete()
+                session.commit()
+                await message.reply(trans['note']['msg_not_found_err'].format(note=message.text[1:]),
+                                    parse_mode='HTML')
+                logger.warning(f"{message.chat.full_name}: Reply msg for note {message.text[1:]} is not found")
+
+    except Exception as e:
+        logger.error(f"{message.chat.full_name}: {message.from_user.full_name} {e}")

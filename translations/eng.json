@@ -72,7 +72,8 @@
     "addnote": "Note added",
     "delnote": "Note removed",
     "dublicate_err": "Such note already exists",
-    "no_such_note_err": "Such note does not exist"
+    "no_such_note_err": "Such note does not exist",
+    "msg_not_found_err": "Unfortunately, forward message for this note is not found. Note <code>{note}</code> deleted"
   },
   "translate": {
     "tr": "",
