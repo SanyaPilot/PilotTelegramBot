@@ -43,12 +43,12 @@ async def mute(message: Message):
                                                                       can_restrict_members=False
                                                                       )
                                     else:
-                                        await message.reply(trans['ban']['admin_err'])
+                                        await message.reply(trans['mute']['admin_err'])
                                         logger.warning(
                                             f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} I can't ban this admin because admin privileges were given not by me")
                                         return
                                 else:
-                                    await message.reply(trans['ban']['no_force_err'])
+                                    await message.reply(trans['mute']['no_force_err'])
                                     logger.warning(
                                         f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} not --force flag")
                                     return
@@ -80,9 +80,9 @@ async def mute(message: Message):
                                                            username=str(message.reply_to_message.from_user.username)))
                                 logger.info(f"{message.chat.full_name}: {message.reply_to_message.from_user.full_name} muted")
                         else:
-                            await message.reply(trans['ban']['same_usr_err'][0])
+                            await message.reply(trans['global']['errors']['affect_on_bot'])
                             logger.warning(
-                                f"{message.chat.full_name}: User {message.from_user.full_name} wanted to ban myself")
+                                f"{message.chat.full_name}: User {message.from_user.full_name} wanted to mute myself")
                     else:
                         await message.reply(trans['global']['errors']['affect_on_bot'])
                         logger.warning(

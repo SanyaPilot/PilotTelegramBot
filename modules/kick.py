@@ -35,12 +35,12 @@ async def kick(message: Message):
                                                                       can_restrict_members=False
                                                                       )
                                     else:
-                                        await message.reply(trans['ban']['admin_err'])
+                                        await message.reply(trans['kick']['admin_err'])
                                         logger.warning(
                                             f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} I can't ban this admin because admin privileges were given not by me")
                                         return
                                 else:
-                                    await message.reply(trans['ban']['no_force_err'])
+                                    await message.reply(trans['kick']['no_force_err'])
                                     logger.warning(
                                         f"{message.chat.full_name}: User {message.from_user.full_name} no --force flag")
                                     return
@@ -56,7 +56,7 @@ async def kick(message: Message):
                                                        username=str(message.reply_to_message.from_user.username)))
                             logger.info(f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} kicked")
                         else:
-                            await message.reply(trans['ban']['same_usr_err'][0])
+                            await message.reply(trans['kick']['same_usr_err'])
                             logger.warning(
                                 f"{message.chat.full_name}: User {message.from_user.full_name} wanted to kick myself")
                     else:
@@ -105,12 +105,12 @@ async def kickme(message: Message):
                                                       can_restrict_members=False
                                                       )
                     else:
-                        await message.reply(trans['ban']['admin_err'])
+                        await message.reply(trans['kick']['admin_err'])
                         logger.warning(
                             f"{message.chat.full_name}: User {message.from_user.full_name} I can't ban this admin because admin privileges were given not by me")
                         return
                 else:
-                    await message.reply(trans['ban']['no_force_err'])
+                    await message.reply(trans['kick']['no_force_err'])
                     logger.warning(
                         f"{message.chat.full_name}: User {message.from_user.full_name} not --force flag")
                     return

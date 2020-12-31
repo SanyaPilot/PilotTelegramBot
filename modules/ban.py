@@ -78,7 +78,7 @@ async def ban(message: Message):
                                                            username=str(message.reply_to_message.from_user.username)))
                                 logger.info(f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name} was banned")
                         else:
-                            await message.reply(trans['ban']['same_usr_err'][0])
+                            await message.reply(trans['ban']['same_usr_err'])
                             logger.warning(f"{message.chat.full_name}: User {message.reply_to_message.from_user.full_name } wanted to ban myself")
                     else:
                         await message.reply(trans['global']['errors']['affect_on_bot'])

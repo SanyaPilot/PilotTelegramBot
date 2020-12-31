@@ -18,7 +18,7 @@
     "ban": "User @{username} was banned\nHe/she won't be able to return to the chat",
     "tban": "User @{username} was banned for {time}\nHe/she will be able to return to the chat after time expiration",
     "unban": "User @{username} was unbanned\nNow he/she can return to the chat",
-    "no_force_err": "In default case I can't ban admins.\nIf you are really sure in your actions, add --force flag",
+    "no_force_err": "By default I can't ban admins.\nIf you are really sure in your actions, add --force flag",
     "admin_err": "Unfortunately, I can't ban this admin because admin privileges were given not by me",
     "same_usr_err": "Why are you trying to ban yourself with this command? If you really want this, use /banme",
     "tban_too_few": "You can't ban user for less than 30 seconds",
@@ -26,13 +26,18 @@
   },
   "kick": {
     "kick": "User @{username} was kicked\nHe/she will be able to return to the chat",
-    "same_usr_err": "Why are you trying to kick yourself with this command? If you really want this, use /kickme"
+    "same_usr_err": "Why are you trying to kick yourself with this command? If you really want this, use /kickme",
+    "no_force_err": "By default I can't kick admins.\nIf you really sure in your actions, add --force flag",
+    "admin_err": "Unfortunately, I can't kick this admin because admin privileges were given not by me"
   },
   "mute": {
     "mute": "User @{username} was muted",
     "tmute": "User @{username} was muted for {time}",
     "tmute_too_few": "You can't mute user for less than 30 seconds",
-    "unmute": "User @{username} can write now"
+    "unmute": "User @{username} can write now",
+    "no_force_err": "By default I can't kick admins.\nIf you really sure in your actions, add --force flag",
+    "admin_err": "Unfortunately, I can't kick this admin because admin privileges were given not by me",
+    "user_not_muted": "This user is not muted"
   },
   "perms": {
     "restrict": "User @{username} was restricted of all user permissions",
