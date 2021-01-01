@@ -10,7 +10,7 @@ async def notes(message: Message):
         return
     try:
         text = '━━━━━━━━━━━━━━━━━━━━\n' + trans['note']['notes']['list'] + '\n━━━━━━━━━━━━━━━━━━━━\n'
-        for name in session.query(Notes.name).all():
+        for name in session.query(Notes.name).filter_by(chat_id=message.chat.id).all():
             text += '\u2022 '
             text += "<code>" + name[0] + "</code>"
             text += '\n'
