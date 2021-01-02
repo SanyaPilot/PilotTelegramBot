@@ -1,9 +1,12 @@
-from profanity_filter import ProfanityFilter
 from loguru import logger
+logger.info('Starting ProfanityFilter import. This may take a while...')
+from profanity_filter import ProfanityFilter
 from init import bot, dp
 from aiogram.types import Message
 ru = ProfanityFilter(languages=['ru', 'en'])
 en = ProfanityFilter(languages=['en'])
+logger.info('ProfanityFilter init           [ OK ]')
+
 
 @dp.message_handler(lambda c: ru.is_profane(c.text))
 @dp.message_handler(lambda c: en.is_profane(c.text))
