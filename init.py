@@ -9,6 +9,8 @@ from utils.translation import TranslationWorker
 
 from loguru import logger
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 logger.info('Welcome to PilotTelegramBot!\nStarting init...')
 bot = Bot(config.token)
 dp = Dispatcher(bot)
@@ -46,4 +48,6 @@ logger.info('SQL Alchemy init               [ OK ]')
 
 tw = TranslationWorker(session, Chats)
 logger.info('TranslationWorker init         [ OK ]')
-logger.info('Init finished! Starting polling...')
+
+sched = AsyncIOScheduler()
+logger.info('APScheduler init               [ OK ]')

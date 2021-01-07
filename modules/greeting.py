@@ -1,9 +1,9 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from init import bot, dp, tw, Chats, session
-from threading import Timer
+from init import bot, dp, tw, Chats, session, sched
+from apscheduler.triggers.interval import IntervalTrigger
 from loguru import logger
 
-timers = {}
+kick_jobs = {}
 
 
 @dp.message_handler(content_types='new_chat_members')
@@ -34,15 +34,21 @@ async def greeting(message: Message):
                                                until_date=0)
                 logger.info(
                     f"{message.chat.full_name}: New user {new_user.full_name}")
-                global timers
-                timers[message.new_chat_members[0].id] = Timer(300.0, kick_bot, [message.chat.id, message.new_chat_members[0].id, message])
-                timers[message.new_chat_members[0].id].start()
+                global kick_jobs
+                if kick_jobs.get(message.chat.id) is None:
+                    kick_jobs[message.chat.id] = {}
+
+                kick_jobs[message.chat.id][message.new_chat_members[0].id] = sched.add_job(kick_bot,
+                                                                                           IntervalTrigger(minutes=5),
+                                                                                           [message.chat.id,
+                                                                                            message.new_chat_members[0].id,
+                                                                                            message])
+
         except IndexError:
             pass
     except Exception as err:
         await message.reply(trans['global']['errors']['default'])
-        logger.error(
-            f"{message.chat.full_name}: {err}")
+        logger.error(f"{message.chat.full_name}: {err}")
 
 
 async def kick_bot(chat_id, user_id, message):
@@ -61,12 +67,12 @@ async def kick_bot(chat_id, user_id, message):
         user = chat_member.user
         await bot.send_message(chat_id=chat_id,
                                text=trans['greeting']['kick_bot'].format(username=str(user.username)))
-        global timers
-        timers.pop(user_id)
+        global kick_jobs
+        kick_jobs[chat_id].pop(user_id)
         logger.info(
             f"{message.chat.full_name}: is bot {user.full_name}")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(e)
 
 
 @dp.message_handler(commands='setgreeting')
@@ -236,7 +242,7 @@ async def call_handler(call: CallbackQuery):
     if trans == 1:
         return
     try:
-        timers[call.from_user.id].cancel()
+        kick_jobs[call.message.chat.id][call.from_user.id].remove()
 
         chat = await bot.get_chat(chat_id=call.message.chat.id)
         perms = chat.permissions
@@ -251,7 +257,8 @@ async def call_handler(call: CallbackQuery):
         await bot.edit_message_text(chat_id=call.message.chat.id,
                                     message_id=call.message.message_id,
                                     text=trans['greeting']['check_success'])
-        timers.pop(call.from_user.id)
+        kick_jobs[call.message.chat.id].pop(call.from_user.id)
+
         logger.info(f"{call.from_user.full_name} is not bot")
     except KeyError as err:
         await bot.answer_callback_query(callback_query_id=call.id,
