@@ -68,6 +68,7 @@ async def kick_bot(chat_id, user_id, message):
         await bot.send_message(chat_id=chat_id,
                                text=trans['greeting']['kick_bot'].format(username=str(user.username)))
         global kick_jobs
+        kick_jobs[chat_id][user_id].remove()
         kick_jobs[chat_id].pop(user_id)
         logger.info(
             f"{message.chat.full_name}: is bot {user.full_name}")
