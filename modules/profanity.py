@@ -7,10 +7,16 @@ ru = ProfanityFilter(languages=['ru', 'en'])
 en = ProfanityFilter(languages=['en'])
 logger.info('ProfanityFilter init           [ OK ]')
 
+whitelist = ['клонируй', 'разраб']
 
-@dp.message_handler(lambda c: ru.is_profane(c.text))
-@dp.message_handler(lambda c: en.is_profane(c.text))
+
+@dp.message_handler()
 async def greeting(message: Message):
-    await bot.delete_message(message.chat.id, message.message_id)
-    await bot.send_message(message.chat.id, "Мат, ууу")
-    logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - profanity!")
+    for word in message.text.split():
+        print(word in whitelist)
+        print(ru.censor_word(word).original_profane_word)
+        if word.lower() not in whitelist and (ru.censor_word(word).original_profane_word or en.censor_word(word).original_profane_word):
+            await bot.delete_message(message.chat.id, message.message_id)
+            await bot.send_message(message.chat.id, "Мат, ууу")
+            logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - profanity!")
+

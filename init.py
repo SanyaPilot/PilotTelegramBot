@@ -15,6 +15,9 @@ logger.info('Welcome to PilotTelegramBot!\nStarting init...')
 bot = Bot(config.token)
 dp = Dispatcher(bot)
 logger.info('AIOgram init                   [ OK ]')
+logger.info('Jumping to Telethon init...')
+
+import modules.telethon.init
 
 Base = declarative_base()
 
@@ -29,10 +32,19 @@ class Notes(Base):
     chat = relationship("Chats", backref='Chat')
 
 
+class Warns(Base):
+    __tablename__ = 'users'
+    user_id = Column(Integer, primary_key=True)
+    username = Column(String, nullable=False)
+    warns = Column(Integer, nullable=False)
+    chat_id = Column(Integer, ForeignKey('chats.chat_id'))
+
+
 class Chats(Base):
     __tablename__ = "chats"
     chat_id = Column(Integer, primary_key=True)
     setup_is_finished = Column(Boolean, nullable=False)
+    helper_in_chat = Column(Boolean, nullable=False)
     greeting = Column(String)
     leave_msg = Column(String)
     language = Column(String, server_default=text('rus'))

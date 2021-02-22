@@ -1,5 +1,7 @@
 config.py
+config1.py
 db.sqlite
 .idea/
 __pycache__/
 venv/
+*.session

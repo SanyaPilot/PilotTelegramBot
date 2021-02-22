@@ -7,8 +7,8 @@ logger.info('Init finished! Starting polling...')
 
 async def on_startup(dp: Dispatcher):
     sched.start()
-    logger.info('APScheduler start           [ OK ]')
-    logger.info('Polling start               [ OK ]')
+    logger.info('APScheduler start        [ OK ]')
+    logger.info('Polling start            [ OK ]')
 
 
 async def on_shutdown(dp: Dispatcher):
