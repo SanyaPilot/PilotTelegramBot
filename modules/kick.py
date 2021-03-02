@@ -28,8 +28,7 @@ async def kick(message: Message):
                     user = entity.user
                     text_mention = True
 
-            helper_in_chat = session.query(Chats.helper_in_chat).filter_by(chat_id=message.chat.id).first()[0]
-            if user and not text_mention and helper_in_chat:
+            if user and not text_mention:
                 try:
                     user = await get_user(user)
                 except ValueError:
