@@ -1,9 +1,15 @@
+# AIOGram imports
 from aiogram import Bot, Dispatcher
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher.filters.state import State, StatesGroup
+
+# SQLAlchemy imports
 from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String,
                         text, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
+# Misc imports
 import config
 from utils.translation import TranslationWorker
 
@@ -13,12 +19,29 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 logger.info('Welcome to PilotTelegramBot!\nStarting init...')
 bot = Bot(config.token)
-dp = Dispatcher(bot)
+
+# FSM enabling
+storage = MemoryStorage()
+dp = Dispatcher(bot, storage=storage)
 logger.info('AIOgram init                   [ OK ]')
 logger.info('Jumping to Telethon init...')
 
+
+# FSM states
+class WarnStates(StatesGroup):
+    set_max = State()
+    set_punishment = State()
+    set_time = State()
+
+
+class SettingsStates(StatesGroup):
+    warns = State()
+    greeting = State()
+
+# Initialising telethon
 import modules.telethon.init
 
+# SQL stuff
 Base = declarative_base()
 
 
@@ -33,9 +56,8 @@ class Notes(Base):
 
 
 class Warns(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'warns'
     user_id = Column(Integer, primary_key=True)
-    username = Column(String, nullable=False)
     warns = Column(Integer, nullable=False)
     chat_id = Column(Integer, ForeignKey('chats.chat_id'))
 
@@ -45,6 +67,9 @@ class Chats(Base):
     chat_id = Column(Integer, primary_key=True)
     setup_is_finished = Column(Boolean, nullable=False)
     helper_in_chat = Column(Boolean, nullable=False)
+    max_warns = Column(Integer, nullable=False)
+    warns_punishment = Column(String)
+    warns_punishment_time = Column(Integer)
     greeting = Column(String)
     leave_msg = Column(String)
     language = Column(String, server_default=text('rus'))

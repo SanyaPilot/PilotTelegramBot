@@ -1,7 +1,7 @@
 from aiogram import executor, Dispatcher
 from init import dp, sched
 from loguru import logger
-from modules import introduction, mute, ban, kick, perms, greeting, note, messages, translate, weather, admin
+from modules import introduction, mute, ban, kick, perms, greeting, note, messages, translate, weather, admin, warn, settings
 logger.info('Init finished! Starting polling...')
 
 

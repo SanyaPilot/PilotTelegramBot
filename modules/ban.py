@@ -2,7 +2,7 @@ from aiogram.types import Message
 from utils.timedelta import parse_timedelta_from_message
 import datetime
 from babel.dates import format_timedelta
-from init import bot, dp, tw, Chats, session
+from init import bot, dp, tw
 from modules.telethon.get_info import get_user_from_username as get_user
 from loguru import logger
 

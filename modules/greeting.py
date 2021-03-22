@@ -56,6 +56,13 @@ async def kick_bot(chat_id, user_id, message):
     if trans == 1:
         return
     try:
+        global kick_jobs
+        result = await bot.get_chat_member(chat_id=chat_id, user_id=user_id)
+        if result.status == 'left' or result.status == 'kicked':
+            kick_jobs[chat_id][user_id].remove()
+            kick_jobs[chat_id].pop(user_id)
+            return
+
         await bot.kick_chat_member(chat_id=chat_id,
                                    user_id=user_id,
                                    until_date=0)
@@ -72,7 +79,6 @@ async def kick_bot(chat_id, user_id, message):
 
         await bot.send_message(chat_id=chat_id,
                                text=trans['greeting']['kick_bot'].format(username=str(username)))
-        global kick_jobs
         kick_jobs[chat_id][user_id].remove()
         kick_jobs[chat_id].pop(user_id)
         logger.info(

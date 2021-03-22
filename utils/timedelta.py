@@ -58,3 +58,24 @@ async def parse_timedelta_from_message(
         return duration
     else:
         return datetime.timedelta(hours=999999)
+
+
+async def parse_clear_timedelta(
+    message: types.Message
+) -> typing.Optional[datetime.timedelta]:
+    arg = message.text
+    ok = False
+    duration = None
+    try:    # Parse custom duration
+        duration = parse_timedelta(arg)
+        ok = True
+    except TimedeltaParseError:
+        pass
+
+    if ok:
+        if duration <= datetime.timedelta(seconds=30):
+            duration = datetime.timedelta(seconds=29)
+
+        return duration
+    else:
+        return datetime.timedelta(hours=999999)
