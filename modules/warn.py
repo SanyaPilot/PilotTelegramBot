@@ -62,12 +62,12 @@ async def warn(message: Message):
                                                     user_id=user.id)
                 if not message.from_user.id == user.id:
                     if (member2.status == 'creator' or member2.status == 'administrator') and not '--force' in message.get_args():
-                        await message.reply(trans['ban']['no_force_err'])
+                        await message.reply(trans['warn']['no_force_err'])
                         logger.warning(
                             f"{message.chat.full_name}: User {message.from_user.full_name} not --force flag")
                         return
 
-                    data = session.query(Warns).filter_by(user_id=user.id).first()
+                    data = session.query(Warns).filter_by(chat_id=message.chat.id, user_id=user.id).first()
                     max_warns = session.query(Chats.max_warns).filter_by(chat_id=message.chat.id).first()
                     warns = None
                     name = None
@@ -80,7 +80,10 @@ async def warn(message: Message):
                         session.commit()
                         warns = data.warns
                         if data.warns == max_warns[0]:
-                            await apply_punishment(message, user, trans, name)
+                            res = await apply_punishment(message, user, trans, name, member2)
+                            if res == 1:
+                                return
+
                             session.query(Warns).filter_by(user_id=user.id, chat_id=message.chat.id).delete()
                             session.commit()
                             return
@@ -107,9 +110,27 @@ async def warn(message: Message):
         logger.error(f"{message.chat.full_name}: User {message.from_user.full_name} {err}")
 
 
-async def apply_punishment(message: Message, user, trans, name):
+async def apply_punishment(message: Message, user, trans, name, member):
     punishment = session.query(Chats.warns_punishment).filter_by(chat_id=message.chat.id).first()
     duration = session.query(Chats.warns_punishment_time).filter_by(chat_id=message.chat.id).first()
+    warns = session.query(Warns).filter_by(chat_id=message.chat.id, user_id=user.id).first()
+    if member.status == 'creator' or member.status == 'administrator':
+        if member.can_be_edited:
+            await bot.promote_chat_member(chat_id=message.chat.id,
+                                          user_id=user.id,
+                                          can_pin_messages=False,
+                                          can_change_info=False,
+                                          can_invite_users=False,
+                                          can_delete_messages=False,
+                                          can_promote_members=False,
+                                          can_restrict_members=False
+                                          )
+        else:
+            await message.reply(trans[punishment[0]]['admin_err'])
+            warns.warns -= 1
+            session.commit()
+            return 1
+
     if punishment[0] == 'mute':
         if duration[0] is None:
             await bot.restrict_chat_member(chat_id=message.chat.id,

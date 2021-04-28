@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ChatType
 from aiogram.dispatcher import FSMContext
-from init import bot, dp, tw, Chats, session, WarnStates
+from init import bot, dp, tw, Chats, session, FirstStartWarnStates
 from loguru import logger
 from modules.telethon.init import me as telethon_me
 from modules.telethon.common import join_chat
@@ -218,10 +218,10 @@ async def callback_handler(call: CallbackQuery):
     if member.status == 'creator' or member.status == 'administrator':
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=trans['warn']['set_max'])
-        await WarnStates.set_max.set()
+        await FirstStartWarnStates.set_max.set()
 
 
-@dp.message_handler(state=WarnStates.set_max)
+@dp.message_handler(state=FirstStartWarnStates.set_max)
 async def set_max_warns(message: Message, state: FSMContext):
     trans = tw.get_translation(message)
     member = await bot.get_chat_member(chat_id=message.chat.id,
@@ -231,17 +231,16 @@ async def set_max_warns(message: Message, state: FSMContext):
             chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
             chat.max_warns = int(message.text)
             session.commit()
-            logger.info(f'Got number {message.text} from chat {message.chat.id}')
             keyboard = InlineKeyboardMarkup()
             keyboard.add(InlineKeyboardButton(text=trans['global']['punishments']['mute'], callback_data='mute'),
                          InlineKeyboardButton(text=trans['global']['punishments']['kick'], callback_data='kick'),
                          InlineKeyboardButton(text=trans['global']['punishments']['ban'], callback_data='ban'),
                          InlineKeyboardButton(text=trans['global']['punishments']['none'], callback_data='none'))
             await bot.send_message(chat_id=message.chat.id, text=trans['warn']['set_punishment'], reply_markup=keyboard)
-            await WarnStates.next()
+            await FirstStartWarnStates.next()
 
 
-@dp.callback_query_handler(state=WarnStates.set_punishment)
+@dp.callback_query_handler(state=FirstStartWarnStates.set_punishment)
 async def set_punishment(call: CallbackQuery, state: FSMContext):
     trans = tw.get_translation(call)
     member = await bot.get_chat_member(chat_id=call.message.chat.id,
@@ -254,13 +253,13 @@ async def set_punishment(call: CallbackQuery, state: FSMContext):
 
         if call.data == 'mute' or call.data == 'ban':
             await bot.send_message(chat_id=call.message.chat.id, text=trans['warn']['set_time'])
-            await WarnStates.next()
+            await FirstStartWarnStates.next()
         else:
             await state.finish()
             await finish(call)
 
 
-@dp.message_handler(state=WarnStates.set_time)
+@dp.message_handler(state=FirstStartWarnStates.set_time)
 async def set_warns_time(message: Message, state: FSMContext):
     trans = tw.get_translation(message)
     member = await bot.get_chat_member(chat_id=message.chat.id,
@@ -270,7 +269,6 @@ async def set_warns_time(message: Message, state: FSMContext):
         if not duration:
             return
 
-        time = 0
         chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
         if not message.text == 'none':
             if duration != datetime.timedelta(hours=999999):

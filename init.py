@@ -28,6 +28,12 @@ logger.info('Jumping to Telethon init...')
 
 
 # FSM states
+class FirstStartWarnStates(StatesGroup):
+    set_max = State()
+    set_punishment = State()
+    set_time = State()
+
+
 class WarnStates(StatesGroup):
     set_max = State()
     set_punishment = State()
@@ -35,6 +41,7 @@ class WarnStates(StatesGroup):
 
 
 class SettingsStates(StatesGroup):
+    menu = State()
     warns = State()
     greeting = State()
 

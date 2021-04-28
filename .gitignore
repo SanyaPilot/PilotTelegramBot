@@ -5,3 +5,4 @@ db.sqlite
 __pycache__/
 venv/
 *.session
+*.session-journal

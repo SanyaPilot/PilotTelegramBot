@@ -21,7 +21,10 @@
       "none": "Disable"
     },
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "ok": "<i><b>Okay!</b></i>",
+    "exit": "\u274c Close",
+    "back": "\u2b05\ufe0f Back"
   },
   "ban": {
     "ban": "User {username} was banned\nHe/she won't be able to return to the chat",
@@ -140,5 +143,13 @@
       "process": "Sent messages: {count}",
       "end": "Broadcast finished.\nMessages sent: {count}"
     }
+  },
+  "settings": {
+    "start": "This is settings menu. Here you can setup the bot to what you need!\nWhat you want to set?",
+    "question": "What you want to set?",
+    "warns": "Warns",
+    "warns_max": "Maximum warns: {}",
+    "warns_punishment": "Punishment: {}",
+    "warns_time": "Punishment duration: {}"
   }
 }
