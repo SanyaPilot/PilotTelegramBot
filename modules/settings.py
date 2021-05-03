@@ -156,13 +156,16 @@ async def set_max_warns(message: Message, state: FSMContext):
             chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
             chat.max_warns = int(message.text)
             session.commit()
+            async with state.proxy() as data:
+                data['msgs_to_del'].append(message)
+
             await SettingsStates.warns.set()
             async with state.proxy() as data:
                 await set_ok(message, data['msg_id'], state)
 
 
 @dp.callback_query_handler(lambda c: c.data == 'punishment', state=SettingsStates.warns)
-async def set_warns_punishment(call: CallbackQuery, state: FSMContext):
+async def set_warns_punishment(call: CallbackQuery):
     trans = tw.get_translation(call)
     await bot.answer_callback_query(call.id)
     member = await bot.get_chat_member(chat_id=call.message.chat.id,
@@ -203,7 +206,7 @@ async def set_warns_time(call: CallbackQuery, state: FSMContext):
                                        user_id=call.from_user.id)
     if member.status == 'creator' or member.status == 'administrator':
         new_message = await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                    text=trans['warn']['set_time'])
+                                                  text=trans['warn']['set_time'])
         async with state.proxy() as data:
             data['msg_id'] = new_message.message_id
 
@@ -219,6 +222,9 @@ async def set_warns_time(message: Message, state: FSMContext):
         duration = await parse_clear_timedelta(message)
         if not duration:
             return
+
+        async with state.proxy() as data:
+            data['msgs_to_del'].append(message)
 
         chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
         if not message.text == 'none':
