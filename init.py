@@ -40,6 +40,11 @@ class WarnStates(StatesGroup):
     set_time = State()
 
 
+class GreetingStates(StatesGroup):
+    set_greeting = State()
+    set_leave_msg = State()
+
+
 class SettingsStates(StatesGroup):
     menu = State()
     warns = State()
@@ -72,7 +77,6 @@ class Warns(Base):
 class Chats(Base):
     __tablename__ = "chats"
     chat_id = Column(Integer, primary_key=True)
-    setup_is_finished = Column(Boolean, nullable=False)
     helper_in_chat = Column(Boolean, nullable=False)
     max_warns = Column(Integer, nullable=False)
     warns_punishment = Column(String)

@@ -14,7 +14,7 @@ async def start(message: Message):
     try:
         if message.chat.type == ChatType.SUPERGROUP:
             if not session.query(Chats.chat_id).filter_by(chat_id=message.chat.id).first() == (message.chat.id,):
-                new_chat = Chats(chat_id=message.chat.id, setup_is_finished=False, helper_in_chat=False, max_warns=5,
+                new_chat = Chats(chat_id=message.chat.id, helper_in_chat=False, max_warns=5,
                                  warns_punishment='mute', warns_punishment_time=7200)
                 session.add(new_chat)
                 logger.info(f"New chat {message.chat.full_name}")
@@ -26,10 +26,8 @@ async def start(message: Message):
 
                 if 'eng.json' in tw.available:
                     new_chat.language = 'eng'
-                    new_chat.setup_is_finished = True
                 else:
                     new_chat.language = tw.available[0].split('.')[0]
-                    new_chat.setup_is_finished = True
 
                 session.commit()
 
@@ -61,14 +59,8 @@ async def help(message: Message):
     if trans == 1:
         return
 
-    lang = session.query(Chats.setup_is_finished).filter_by(chat_id=message.chat.id)
-    if not lang:
-        text = trans['global']['errors']['setup']
-    else:
-        text = trans['introduction']['help']
-
     await bot.send_message(chat_id=message.chat.id,
-                           text=text)
+                           text=trans['introduction']['help'])
     logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - {message.text}")
 
 
