@@ -1,0 +1,8 @@
+config.py
+db.sqlite
+.idea/
+__pycache__/
+venv/
+*.session
+*.session-journal
+ 
