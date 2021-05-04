@@ -19,7 +19,8 @@ from utils.translation import TranslationWorker
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-logger.info('Welcome to PilotTelegramBot!\nStarting init...')
+logger.info('Welcome to PilotTelegramBot!')
+logger.info('Starting init...')
 
 docker_init = False
 if os.path.exists('config.py'):
@@ -35,8 +36,10 @@ elif os.path.exists('/config/config.py'):
     docker_init = True
     sys.path.insert(1, '/config')
     import config
-
-
+else:
+    logger.error("Can't init! If starting in normal way, check config.py. If starting as Docker container, "
+                 "apply RW bind-mount to /config container's directory")
+    sys.exit(1)
 
 bot = Bot(config.token)
 
