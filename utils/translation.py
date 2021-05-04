@@ -1,13 +1,13 @@
 import json
 import os
-import config
 from loguru import logger
 
 
 class TranslationWorker:
-    def __init__(self, session, chat):
+    def __init__(self, session, chat, default_lang):
         self.session = session
         self.Chats = chat
+        self.default_lang = default_lang
         self.available = os.listdir('translations')
         text = 'Available translations:'
         for i in self.available:
@@ -26,7 +26,7 @@ class TranslationWorker:
             if not default:
                 return self.translations[self.get_lang(data)]
             else:
-                return self.translations[config.default_lang.split('.')[0]]
+                return self.translations[self.default_lang.split('.')[0]]
         except IndexError:
             return 1
 

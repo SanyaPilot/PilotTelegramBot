@@ -1,3 +1,8 @@
+import sys
+import os
+import shutil
+from loguru import logger
+
 # AIOGram imports
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,14 +15,29 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
 # Misc imports
-import config
 from utils.translation import TranslationWorker
-
-from loguru import logger
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 logger.info('Welcome to PilotTelegramBot!\nStarting init...')
+
+docker_init = False
+if os.path.exists('config.py'):
+    logger.info('Normal init')
+    import config
+elif os.path.exists('/config/') and not os.path.exists('/config/config.py'):
+    logger.info('Docker first start init')
+    shutil.copyfile('config.example', '/config/config.py')
+    logger.info('Now fill lines in config.py and restart container again')
+    sys.exit(0)
+elif os.path.exists('/config/config.py'):
+    logger.info('Docker init')
+    docker_init = True
+    sys.path.insert(1, '/config')
+    import config
+
+
+
 bot = Bot(config.token)
 
 # FSM enabling
@@ -86,15 +106,17 @@ class Chats(Base):
     language = Column(String, server_default=text('rus'))
 
 
-engine = create_engine(
-            "sqlite:///db.sqlite", 
-        )
+if docker_init:
+    engine = create_engine("sqlite:////config/db.sqlite", )
+else:
+    engine = create_engine("sqlite:///db.sqlite", )
+
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 logger.info('SQL Alchemy init               [ OK ]')
 
-tw = TranslationWorker(session, Chats)
+tw = TranslationWorker(session, Chats, config.default_lang)
 logger.info('TranslationWorker init         [ OK ]')
 
 sched = AsyncIOScheduler()
