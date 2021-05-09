@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from init import bot, dp, tw, SettingsStates
 from loguru import logger
 
-import modules.settings.warns
+from modules.settings import warns, greeting
 
 
 @dp.message_handler(commands='settings')
@@ -18,13 +18,14 @@ async def settings(message: Message, state: FSMContext):
             await SettingsStates.menu.set()
             keyboard = InlineKeyboardMarkup(row_width=1)
             keyboard.add(InlineKeyboardButton(text=trans['settings']['warns'], callback_data='warns'),
+                         InlineKeyboardButton(text=trans['settings']['greeting'], callback_data='greeting'),
                          InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
 
-            async with state.proxy() as data:
-                data['msg_id'] = message.message_id
-                data['msgs_to_del'] = []
+            new_message = await message.reply(text=trans['settings']['start'], reply_markup=keyboard)
 
-            await message.reply(text=trans['settings']['start'], reply_markup=keyboard)
+            async with state.proxy() as data:
+                data['msg_id'] = new_message.message_id
+                data['msgs_to_del'] = []
     except Exception as e:
         logger.error(e)
 
@@ -41,6 +42,7 @@ async def home(call: CallbackQuery):
         if member.status == 'creator' or member.status == 'administrator':
             keyboard = InlineKeyboardMarkup(row_width=1)
             keyboard.add(InlineKeyboardButton(text=trans['settings']['warns'], callback_data='warns'),
+                         InlineKeyboardButton(text=trans['settings']['greeting'], callback_data='greeting'),
                          InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
 
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,

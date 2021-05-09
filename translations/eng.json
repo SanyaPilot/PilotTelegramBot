@@ -75,12 +75,12 @@
   "greeting": {
     "greeting": ["I want to chat!", "No, I don't want to chat!", "Maybe... no"],
     "kick_bot": "User @{username} failed bot check.\nIt was kicked",
-    "set_greeting": "Greeting set successfully!",
-    "rm_greeting": "Greeting removed successfully!",
-    "set_user_leave_msg": "User leave message set successfully!",
-    "rm_user_leave_msg": "User leave message removed successfully!",
+    "set_greeting": "Enter greeting.\nFormatting with HTML tags is supported\nYou can see list of all supported tags here: https://core.telegram.org/bots/api#html-style\nOr enter <code>none</code> to disable greeting",
+    "set_leave_msg": "Enter message about user leave.\nFormatting with HTML tags is supported\nYou can see list of all supported tags here: https://core.telegram.org/bots/api#html-style\nOr enter <code>none</code> to disable message about user leave",
     "check_success": "You successfully passed bot check!",
-    "other_user_err": "You can't pass other user's bot check"
+    "other_user_err": "You can't pass other user's bot check",
+    "how_it_looks": "Here how it looks:\n{}",
+    "format_wrong": "Something wrong with formatting!\nTelegram says: {}\nTry again"
   },
   "introduction": {
     "start": "Hello! I'm administrative bot for a chat!\nFrom this moment I will help in this chat.\nFor correct work you should give me administrative privileges.\nPlease choose language. This will affect all bot's messages.",
@@ -150,6 +150,9 @@
     "warns": "Warns",
     "warns_max": "Maximum warns: {}",
     "warns_punishment": "Punishment: {}",
-    "warns_time": "Punishment duration: {}"
+    "warns_time": "Punishment duration: {}",
+    "greeting": "Greeting",
+    "greeting_text": "Greeting text: {}",
+    "leave_msg_text": "Leave message text: {}"
   }
 }
