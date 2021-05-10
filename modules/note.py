@@ -1,5 +1,5 @@
 from aiogram.types import Message
-from init import bot, dp, tw, Notes, session
+from init import bot, dp, tw, Notes, Chats, session
 from loguru import logger
 
 
@@ -34,7 +34,11 @@ async def note(message: Message):
             msg_id = session.query(Notes.message_id).filter_by(name=message.text.split()[1], chat_id=message.chat.id).first()
             if msg_id:
                 try:
-                    await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+                    chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                    if not chat.notes_send_type:
+                        await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+                    else:
+                        await bot.copy_message(message.chat.id, message.chat.id, msg_id[0])
                     logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
                 except Exception:
                     session.query(Notes).filter_by(name=message.text.split()[1], chat_id=message.chat.id).delete()
@@ -127,7 +131,11 @@ async def text_handler(message: Message):
                                                            chat_id=message.chat.id).first()
         if msg_id:
             try:
-                await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+                chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
+                if not chat.notes_send_type:
+                    await bot.forward_message(message.chat.id, message.chat.id, msg_id[0])
+                else:
+                    await bot.copy_message(message.chat.id, message.chat.id, msg_id[0])
                 logger.info(f"{message.chat.full_name}: {message.from_user.full_name} - note")
             except Exception:
                 trans = tw.get_translation(message)

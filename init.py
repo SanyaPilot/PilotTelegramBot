@@ -72,6 +72,7 @@ class SettingsStates(StatesGroup):
     menu = State()
     warns = State()
     greeting = State()
+    notes = State()
 
 # Initialising telethon
 import modules.telethon.init
@@ -104,6 +105,7 @@ class Chats(Base):
     max_warns = Column(Integer, nullable=False)
     warns_punishment = Column(String)
     warns_punishment_time = Column(Integer)
+    notes_send_type = Column(Boolean, nullable=False)
     greeting = Column(String)
     leave_msg = Column(String)
     language = Column(String, server_default=text('rus'))

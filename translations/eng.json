@@ -153,6 +153,8 @@
     "warns_time": "Punishment duration: {}",
     "greeting": "Greeting",
     "greeting_text": "Greeting text: {}",
-    "leave_msg_text": "Leave message text: {}"
+    "leave_msg_text": "Leave message text: {}",
+    "notes": "Notes",
+    "notes_send_type": "Show author of saved message? {}"
   }
 }
