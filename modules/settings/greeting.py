@@ -105,6 +105,8 @@ async def set_greeting_text(message: Message, state: FSMContext):
         me = await bot.get_chat_member(chat_id=message.chat.id, user_id=bot_id)
         if me.can_restrict_members:
             await SettingsStates.greeting.set()
+            async with state.proxy() as data:
+                data['msgs_to_del'].append(message)
 
             if not message.text == 'none':
                 result = await show_message(message, state)
@@ -119,9 +121,6 @@ async def set_greeting_text(message: Message, state: FSMContext):
                 chat.greeting = message.text
 
             session.commit()
-
-            async with state.proxy() as data:
-                data['msgs_to_del'].append(message)
 
             async with state.proxy() as data:
                 await set_ok(message, data['msg_id'], state)
@@ -155,6 +154,8 @@ async def set_leave_msg(message: Message, state: FSMContext):
                                        user_id=message.from_user.id)
     if member.status == 'creator' or member.status == 'administrator':
         await SettingsStates.greeting.set()
+        async with state.proxy() as data:
+            data['msgs_to_del'].append(message)
 
         if not message.text == 'none':
             result = await show_message(message, state)
@@ -169,9 +170,6 @@ async def set_leave_msg(message: Message, state: FSMContext):
             chat.leave_msg = message.text
 
         session.commit()
-
-        async with state.proxy() as data:
-            data['msgs_to_del'].append(message)
 
         async with state.proxy() as data:
             await set_ok(message, data['msg_id'], state)
