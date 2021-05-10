@@ -98,11 +98,18 @@
       "list": "Notes list:",
       "instruction": "You can retrieve these notes by using /note (note name) or #(note name)"
     },
-    "addnote": "Note added",
-    "delnote": "Note removed",
+    "addnote": "Note added!",
+    "delnote": "Note removed!",
     "dublicate_err": "Such note already exists",
     "no_such_note_err": "Such note does not exist",
     "msg_not_found_err": "Unfortunately, forward message for this note is not found. Note <code>{note}</code> deleted"
+  },
+  "trigger": {
+    "list": "Triggers list:",
+    "addtrigger": "Тrigger added!",
+    "deltrigger": "Trigger removed!",
+    "dublicate_err": "Such trigger already exists",
+    "no_such_trigger_err": "Such trigger does not exist"
   },
   "translate": {
     "tr": "",

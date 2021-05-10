@@ -83,12 +83,19 @@ Base = declarative_base()
 
 class Notes(Base):
     __tablename__ = "notes"
-
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     message_id = Column(Integer, nullable=False)
     chat_id = Column(Integer, ForeignKey('chats.chat_id'))
     chat = relationship("Chats", backref='Chat')
+
+
+class Triggers(Base):
+    __tablename__ = 'triggers'
+    id = Column(Integer, primary_key=True)
+    word = Column(String, nullable=False)
+    message_id = Column(Integer, nullable=False)
+    chat_id = Column(Integer, ForeignKey('chats.chat_id'))
 
 
 class Warns(Base):
