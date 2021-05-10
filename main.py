@@ -1,9 +1,14 @@
 from aiogram import executor, Dispatcher
 from init import dp, sched
 from loguru import logger
-from modules import (introduction, mute, ban, kick, perms, greeting, note, messages, translate, weather, admin, warn,
-                     triggers)
+
+from modules import antispam
+from modules import introduction, greeting
 from modules.settings import settings
+from modules import perms, admin, warn
+from modules import mute, ban, kick
+from modules import note, messages, translate, weather
+from modules import triggers
 
 logger.info('Init finished! Starting polling...')
 
@@ -21,3 +26,4 @@ async def on_shutdown(dp: Dispatcher):
 
 if __name__ == '__main__':
     executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
+

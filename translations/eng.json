@@ -162,6 +162,9 @@
     "greeting_text": "Greeting text: {}",
     "leave_msg_text": "Leave message text: {}",
     "notes": "Notes",
-    "notes_send_type": "Show author of saved message? {}"
+    "notes_send_type": "Show author of saved message? {}",
+    "antispam": "Antispam",
+    "antispam_max": "Maximum messages in a row: {}",
+    "antispam_punish_admins": "Punish admins? (if possible) {}"
   }
 }

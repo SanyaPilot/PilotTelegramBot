@@ -63,6 +63,12 @@ class WarnStates(StatesGroup):
     set_time = State()
 
 
+class AntispamStates(StatesGroup):
+    set_max = State()
+    set_punishment = State()
+    set_time = State()
+
+
 class GreetingStates(StatesGroup):
     set_greeting = State()
     set_leave_msg = State()
@@ -73,6 +79,7 @@ class SettingsStates(StatesGroup):
     warns = State()
     greeting = State()
     notes = State()
+    antispam = State()
 
 # Initialising telethon
 import modules.telethon.init
@@ -113,6 +120,10 @@ class Chats(Base):
     warns_punishment = Column(String)
     warns_punishment_time = Column(Integer)
     notes_send_type = Column(Boolean, nullable=False)
+    antispam_max = Column(Integer, nullable=False)
+    antispam_punishment = Column(String)
+    antispam_punishment_time = Column(Integer)
+    antispam_can_punish_admins = Column(Boolean, nullable=False)
     greeting = Column(String)
     leave_msg = Column(String)
     language = Column(String, server_default=text('rus'))

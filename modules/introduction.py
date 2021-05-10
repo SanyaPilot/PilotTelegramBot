@@ -15,7 +15,8 @@ async def start(message: Message):
         if message.chat.type == ChatType.SUPERGROUP:
             if not session.query(Chats.chat_id).filter_by(chat_id=message.chat.id).first() == (message.chat.id,):
                 new_chat = Chats(chat_id=message.chat.id, helper_in_chat=False, max_warns=5,
-                                 warns_punishment='mute', warns_punishment_time=7200, notes_send_type=False)
+                                 warns_punishment='mute', warns_punishment_time=7200, notes_send_type=False,
+                                 antispam_max=10, antispam_can_punish_admins=False)
                 session.add(new_chat)
                 logger.info(f"New chat {message.chat.full_name}")
 
