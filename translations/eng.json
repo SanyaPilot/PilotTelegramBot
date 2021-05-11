@@ -65,8 +65,10 @@
   },
   "warn": {
     "warn": "User {username} warned.\nTotal warns:<i>{current_warns} from {max_warns}</i>",
+    "reset": "<b><i>Okay!</i></b>\nWarns of user {} are reset!",
+    "no_warns_err": "This user doesn't have any warns",
     "no_force_err": "By default I can't warn admins.\nIf you are really sure in your actions, add --force flag",
-    "same_usr_err": "Why are you trying to warn yourself?",
+    "same_usr_err": ["Why are you trying to warn yourself?", "Why are you trying to reset warns for yourself?"],
     "set_max": "Enter maximum number of warns",
     "set_punishment": "Okay! Select punishment:",
     "set_time": "And now it needs to enter punishment duration.\nEnter time in format <quantity><s/m/h/d>\nFor example: 5m, 45s, 2h\nOr enter none to make punishment infinite",
