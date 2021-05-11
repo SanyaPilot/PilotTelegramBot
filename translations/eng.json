@@ -18,6 +18,7 @@
       "mute": "Mute",
       "kick": "Kick",
       "ban": "Ban",
+      "warn": "Warn",
       "none": "Disable"
     },
     "yes": "Yes",

@@ -1,5 +1,6 @@
 from aiogram.types import Message, ContentType
 from init import bot, dp, tw, Chats, session
+from modules.warn import warn
 from time import time
 from babel.dates import format_timedelta
 from loguru import logger
@@ -117,5 +118,8 @@ async def apply_punishment(message: Message, punishment):
         await bot.send_message(chat_id=message.chat.id,
                                text=trans['kick']['kick'].format(
                                    username=message.from_user.full_name))
+
+    elif punishment[0] == 'warn':
+        await warn(message, message.from_user)
 
     chats[message.chat.id] = None

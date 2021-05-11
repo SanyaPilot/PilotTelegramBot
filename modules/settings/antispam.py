@@ -26,7 +26,7 @@ async def antispam_menu(message: Message, msg_id):
 
     punishment = session.query(Chats.antispam_punishment).filter_by(chat_id=message.chat.id).first()
 
-    if not (punishment[0] is None or punishment[0] == 'kick'):
+    if not (punishment[0] is None or punishment[0] == 'kick' or punishment[0] == 'warn'):
         if chat.antispam_punishment_time is not None:
             time_text = format_timedelta(chat.antispam_punishment_time, locale='ru', granularity="seconds", format="short")
         else:
@@ -101,10 +101,11 @@ async def set_warns_punishment(call: CallbackQuery):
                                        user_id=call.from_user.id)
     if member.status == 'creator' or member.status == 'administrator':
         keyboard = InlineKeyboardMarkup()
-        keyboard.add(InlineKeyboardButton(text=trans['global']['punishments']['mute'], callback_data='mute'),
+        keyboard.add(InlineKeyboardButton(text=trans['global']['punishments']['warn'], callback_data='warn'))
+        keyboard.row(InlineKeyboardButton(text=trans['global']['punishments']['mute'], callback_data='mute'),
                      InlineKeyboardButton(text=trans['global']['punishments']['kick'], callback_data='kick'),
-                     InlineKeyboardButton(text=trans['global']['punishments']['ban'], callback_data='ban'),
-                     InlineKeyboardButton(text=trans['global']['punishments']['none'], callback_data='none'))
+                     InlineKeyboardButton(text=trans['global']['punishments']['ban'], callback_data='ban'))
+        keyboard.row(InlineKeyboardButton(text=trans['global']['punishments']['none'], callback_data='none'))
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text=trans['warn']['set_punishment'], reply_markup=keyboard)
         await AntispamStates.set_punishment.set()

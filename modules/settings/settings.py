@@ -16,12 +16,12 @@ async def settings(message: Message, state: FSMContext):
                                            user_id=message.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
             await SettingsStates.menu.set()
-            keyboard = InlineKeyboardMarkup(row_width=1)
+            keyboard = InlineKeyboardMarkup(row_width=2)
             keyboard.add(InlineKeyboardButton(text=trans['settings']['warns'], callback_data='warns'),
                          InlineKeyboardButton(text=trans['settings']['greeting'], callback_data='greeting'),
                          InlineKeyboardButton(text=trans['settings']['notes'], callback_data='notes'),
-                         InlineKeyboardButton(text=trans['settings']['antispam'], callback_data='antispam'),
-                         InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
+                         InlineKeyboardButton(text=trans['settings']['antispam'], callback_data='antispam'))
+            keyboard.row(InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
 
             new_message = await message.reply(text=trans['settings']['start'], reply_markup=keyboard)
 
@@ -42,12 +42,12 @@ async def home(call: CallbackQuery):
         member = await bot.get_chat_member(chat_id=call.message.chat.id,
                                            user_id=call.from_user.id)
         if member.status == 'creator' or member.status == 'administrator':
-            keyboard = InlineKeyboardMarkup(row_width=1)
+            keyboard = InlineKeyboardMarkup(row_width=2)
             keyboard.add(InlineKeyboardButton(text=trans['settings']['warns'], callback_data='warns'),
                          InlineKeyboardButton(text=trans['settings']['greeting'], callback_data='greeting'),
                          InlineKeyboardButton(text=trans['settings']['notes'], callback_data='notes'),
-                         InlineKeyboardButton(text=trans['settings']['antispam'], callback_data='antispam'),
-                         InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
+                         InlineKeyboardButton(text=trans['settings']['antispam'], callback_data='antispam'))
+            keyboard.row(InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
 
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                         text=trans['settings']['start'], reply_markup=keyboard)
