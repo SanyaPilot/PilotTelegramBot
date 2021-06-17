@@ -9,6 +9,8 @@ async def settings_notes(call: CallbackQuery):
     if trans == 1:
         return
 
+    await bot.answer_callback_query(call.id)
+
     chat = session.query(Chats).filter_by(chat_id=call.message.chat.id).first()
     keyboard = InlineKeyboardMarkup()
 
@@ -31,6 +33,8 @@ async def set_send_type(call: CallbackQuery):
     trans = tw.get_translation(call)
     if trans == 1:
         return
+
+    await bot.answer_callback_query(call.id)
 
     chat = session.query(Chats).filter_by(chat_id=call.message.chat.id).first()
     keyboard = InlineKeyboardMarkup()

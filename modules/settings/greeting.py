@@ -49,10 +49,7 @@ async def set_ok(message, msg_id, state):
     await bot.delete_message(chat_id=message.chat.id, message_id=msg_id)
     async with state.proxy() as data:
         if data['msgs_to_del']:
-            dbg = 0
             for msg in data['msgs_to_del']:
-                dbg += 1
-                print(dbg)
                 await bot.delete_message(msg.chat.id, msg.message_id)
 
             data['msgs_to_del'] = []

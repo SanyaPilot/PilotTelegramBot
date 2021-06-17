@@ -28,7 +28,7 @@ async def warns_menu(message, msg_id):
 
     if not (punishment[0] is None or punishment[0] == 'kick'):
         if chat.warns_punishment_time is not None:
-            time_text = format_timedelta(chat.warns_punishment_time, locale='ru', granularity="seconds", format="short")
+            time_text = format_timedelta(chat.warns_punishment_time, locale=trans['id'], granularity="seconds", format="short")
         else:
             time_text = '\u274c'
         keyboard.row(InlineKeyboardButton(text=trans['settings']['warns_time'].format(time_text),
@@ -73,12 +73,13 @@ async def set_max_warns(message: Message, state: FSMContext):
     member = await bot.get_chat_member(chat_id=message.chat.id,
                                        user_id=message.from_user.id)
     if member.status == 'creator' or member.status == 'administrator':
+        async with state.proxy() as state_data:
+            state_data['msgs_to_del'].append(message)
+
         if message.text.isdigit():
             chat = session.query(Chats).filter_by(chat_id=message.chat.id).first()
             chat.max_warns = int(message.text)
             session.commit()
-            async with state.proxy() as data:
-                data['msgs_to_del'].append(message)
 
             await SettingsStates.warns.set()
             async with state.proxy() as data:
