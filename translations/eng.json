@@ -75,6 +75,9 @@
     "time_too_small": "Time can't be less then 30 seconds. Enter another one",
     "time_not_found": "I can't see time here! Try again"
   },
+  "antispam": {
+    "set_max": "Enter maximum number of messages in a row. A punishment will be applied upon reaching that"
+  },
   "greeting": {
     "greeting": ["I want to chat!", "No, I don't want to chat!", "Maybe... no"],
     "kick_bot": "User @{username} failed bot check.\nIt was kicked",
@@ -166,8 +169,13 @@
     "leave_msg_text": "Leave message text: {}",
     "notes": "Notes",
     "notes_send_type": "Show author of saved message? {}",
-    "antispam": "Antispam",
-    "antispam_max": "Maximum messages in a row: {}",
-    "antispam_punish_admins": "Punish admins? (if possible) {}"
+    "antispam": {
+      "antispam": "Antispam",
+      "max": "Maximum messages in a row: {}",
+      "punish_admins": "Punish admins? (if possible) {}",
+      "default_rule": "All messages",
+      "stickers_rule": "Stickers",
+      "gifs_rule": "GIFs"
+    }
   }
 }

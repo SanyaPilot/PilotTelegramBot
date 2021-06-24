@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher import FSMContext
-from init import bot, dp, tw, SettingsStates
+from init import bot, dp, tw, SettingsStates, AntispamStates
 from loguru import logger
 
 from modules.settings import warns, greeting, notes, antispam
@@ -20,7 +20,7 @@ async def settings(message: Message, state: FSMContext):
             keyboard.add(InlineKeyboardButton(text=trans['settings']['warns'], callback_data='warns'),
                          InlineKeyboardButton(text=trans['settings']['greeting'], callback_data='greeting'),
                          InlineKeyboardButton(text=trans['settings']['notes'], callback_data='notes'),
-                         InlineKeyboardButton(text=trans['settings']['antispam'], callback_data='antispam'))
+                         InlineKeyboardButton(text=trans['settings']['antispam']['antispam'], callback_data='antispam'))
             keyboard.row(InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
 
             new_message = await message.reply(text=trans['settings']['start'], reply_markup=keyboard)
@@ -46,7 +46,7 @@ async def home(call: CallbackQuery):
             keyboard.add(InlineKeyboardButton(text=trans['settings']['warns'], callback_data='warns'),
                          InlineKeyboardButton(text=trans['settings']['greeting'], callback_data='greeting'),
                          InlineKeyboardButton(text=trans['settings']['notes'], callback_data='notes'),
-                         InlineKeyboardButton(text=trans['settings']['antispam'], callback_data='antispam'))
+                         InlineKeyboardButton(text=trans['settings']['antispam']['antispam'], callback_data='antispam'))
             keyboard.row(InlineKeyboardButton(text=trans['global']['exit'], callback_data='exit'))
 
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -56,7 +56,7 @@ async def home(call: CallbackQuery):
         logger.error(e)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'exit', state=SettingsStates)
+@dp.callback_query_handler(lambda c: c.data == 'exit', state=[SettingsStates, AntispamStates])
 async def menu_exit(call: CallbackQuery, state: FSMContext):
     await bot.delete_message(call.message.chat.id, call.message.message_id)
     await state.finish()

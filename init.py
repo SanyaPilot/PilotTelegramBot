@@ -64,6 +64,7 @@ class WarnStates(StatesGroup):
 
 
 class AntispamStates(StatesGroup):
+    menu = State()
     set_max = State()
     set_punishment = State()
     set_time = State()
@@ -120,10 +121,11 @@ class Chats(Base):
     warns_punishment = Column(String)
     warns_punishment_time = Column(Integer)
     notes_send_type = Column(Boolean, nullable=False)
-    antispam_max = Column(Integer, nullable=False)
-    antispam_punishment = Column(String)
-    antispam_punishment_time = Column(Integer)
-    antispam_can_punish_admins = Column(Boolean, nullable=False)
+    antispam_rules = Column(String, nullable=False)
+    # antispam_max = Column(Integer, nullable=False)
+    # antispam_punishment = Column(String)
+    # antispam_punishment_time = Column(Integer)
+    # antispam_can_punish_admins = Column(Boolean, nullable=False)
     greeting = Column(String)
     leave_msg = Column(String)
     language = Column(String, server_default=text('rus'))

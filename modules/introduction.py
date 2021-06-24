@@ -1,6 +1,7 @@
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ChatType
 from aiogram.dispatcher import FSMContext
 from init import bot, dp, tw, Chats, session, FirstStartWarnStates
+import json
 from loguru import logger
 from modules.telethon.init import me as telethon_me
 from modules.telethon.common import join_chat
@@ -14,9 +15,12 @@ async def start(message: Message):
     try:
         if message.chat.type == ChatType.SUPERGROUP:
             if not session.query(Chats.chat_id).filter_by(chat_id=message.chat.id).first() == (message.chat.id,):
+                antispam_payload = {'default': {'max': 10, 'punishment': None, 'time': None, 'punish_admins': False},
+                                    'stickers': {'max': 5, 'punishment': None, 'time': None, 'punish_admins': False},
+                                    'gifs': {'max': 5, 'punishment': None, 'time': None, 'punish_admins': False}}
                 new_chat = Chats(chat_id=message.chat.id, helper_in_chat=False, max_warns=5,
                                  warns_punishment='mute', warns_punishment_time=7200, notes_send_type=False,
-                                 antispam_max=10, antispam_can_punish_admins=False)
+                                 antispam_rules=json.dumps(antispam_payload))
                 session.add(new_chat)
                 logger.info(f"New chat {message.chat.full_name}")
 
